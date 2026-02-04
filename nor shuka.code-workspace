@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../site-starter"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "նոր շուկա",
+		"liveServer.settings.port": 5501
+	}
+}

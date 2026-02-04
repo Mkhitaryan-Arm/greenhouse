@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenHouse.am - Պրոֆեսիոնալ Պատվեր</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f0f2f5; min-height: 100vh; padding-bottom: 100px; }
+        
+        .navbar {
+            background: white; padding: 15px 5%; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { color: #764ba2; font-size: 24px; font-weight: bold; }
+
+        .container { padding: 30px 5%; }
+        .section-title { margin-bottom: 25px; color: #333; font-size: 24px; border-left: 5px solid #764ba2; padding-left: 15px; }
+
+        /* Flower Grid */
+        .flowers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
+        .flower-card { background: white; border-radius: 15px; overflow: hidden; cursor: pointer; transition: 0.3s; border: 1px solid #eee; text-align: center; }
+        .flower-card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
+        .flower-img { width: 100%; height: 200px; object-fit: cover; }
+        .flower-info { padding: 15px; }
+
+        /* Greenhouse Grid */
+        .gh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .gh-card { background: white; border-radius: 12px; padding: 20px; border-top: 5px solid #ccc; position: relative; }
+        .gh-card.available { border-top-color: #28a745; }
+
+        /* Cart Floating Bar */
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 5%; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 1500; }
+        .cart-total { font-size: 18px; font-weight: bold; color: #764ba2; }
+
+        /* Social Buttons */
+        .social-btns { display: flex; gap: 8px; }
+        .s-btn { padding: 10px 15px; border-radius: 8px; color: white; border: none; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 14px; }
+        .btn-tg { background: #0088cc; }
+        .btn-wa { background: #25d366; }
+        .btn-vb { background: #7360f2; }
+
+        /* Cart Modal */
+        .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2500; align-items: center; justify-content: center; }
+        .cart-content { background: white; width: 95%; max-width: 500px; border-radius: 20px; padding: 25px; max-height: 80vh; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .cart-item-info { flex: 1; }
+        .cart-item-qty { display: flex; align-items: center; gap: 10px; }
+        .qty-btn { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #ddd; background: #f9f9f9; cursor: pointer; }
+
+        /* General Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: white; padding: 30px; width: 90%; max-width: 450px; border-radius: 20px; text-align: center; }
+        .type-btn { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        
+        .admin-box { display: none; margin-top: 15px; border-top: 1px dashed #eee; padding-top: 10px; }
+        body.admin-mode .admin-box { display: block; }
+        .btn { padding: 10px 20px; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">🌸 GreenHouse.am</div>
+        <div>
+            <button class="btn" style="background:#ff9f43; color:white; margin-right: 10px;" onclick="toggleAdmin()">🔒 Ադմին</button>
+            <button class="btn" style="background:#764ba2; color:white" onclick="logout()">Ելք</button>
+        </div>
+    </div>
+
+    <div class="container" id="flowerSection">
+        <h2 class="section-title">Մեր Ծաղիկները</h2>
+        <div class="flowers-grid" id="flowersGrid"></div>
+    </div>
+
+    <div class="container hidden" id="ghSection">
+        <button class="btn" onclick="showFlowers()" style="background:#ddd; margin-bottom:20px;">← Հետ</button>
+        <h2 id="ghTitle" class="section-title"></h2>
+        <div class="gh-grid" id="ghGrid"></div>
+    </div>
+
+    <div class="cart-bar" id="cartBar">
+        <div class="cart-total" onclick="openCart()">🛒 Զամբյուղ: <span id="totalPrice">0</span> ֏</div>
+        <div class="social-btns">
+            <button class="s-btn btn-tg" onclick="checkout('tg')">Telegram</button>
+            <button class="s-btn btn-wa" onclick="checkout('wa')">WhatsApp</button>
+            <button class="s-btn btn-vb" onclick="checkout('vb')">Viber</button>
+        </div>
+    </div>
+
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <h2 style="margin-bottom: 20px;">Ձեր Պատվերը</h2>
+            <div id="cartItemsList"></div>
+            <div style="margin-top: 20px; text-align: right; font-weight: bold; font-size: 20px;">
+                Ընդհանուր: <span id="modalTotal">0</span> ֏
+            </div>
+            <button class="btn" onclick="closeCart()" style="width: 100%; margin-top: 15px; background: #764ba2; color: white;">Շարունակել գնումները</button>
+        </div>
+    </div>
+
+    <div id="typeModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <div id="typesList" style="margin-top: 20px;"></div>
+            <button onclick="closeModal()" style="margin-top: 15px; color: red; border: none; background: none; cursor: pointer;">Փակել</button>
+        </div>
+    </div>
+
+    <script>
+        const flowers = [
+            { id: 1, name: 'Վարդ', img: 'https://upload.wikimedia.org/wikipedia/commons/0/01/%D5%8E%D5%A1%D6%80%D5%A4%D5%A1%D5%A3%D5%B8%D6%82%D5%B5%D5%B6_%D5%BE%D5%A1%D6%80%D5%A4_2.jpg', types: ['Կարմիր', 'Սպիտակ', 'Բոռդո'] },
+            { id: 2, name: 'Կակաչ', img: 'https://www.plantarium.ru/dat/plants/5/553/570553_9dceb5f4.jpg', types: ['Դեղին', 'Կարմիր', 'Մանուշակագույն'] },
+            { id: 3, name: 'Օրխիդեա', img: 'https://kolibricompany.nl/wp-content/uploads/2022/04/PRINT-OKPlantnieuwecollectie2023-515-bolzano-colourful-optimism-optimized.jpg', types: ['Սպիտակ', 'Վարդագույն'] },
+            { id: 4, name: 'Գիպսոֆիլա', img: 'https://www.gardenia.net/wp-content/uploads/2023/05/baby-breath-how-to-grow-and-care-780x520.webp', types: ['Սպիտակ', 'Երկնագույն'] },
+            { id: 5, name: 'Լիլիա', img: 'https://hayfermer.am/uploads/posts/2017-05/1494075160_ed2e16fccd0341c97e6d848d6c17a1b2.jpg', types: ['Արքայական', 'Վագրային'] },
+            { id: 6, name: 'Պիոն', img: 'https://www.gardendesign.com/pictures/images/900x705Max/site_3/pink-hawaiian-coral-herbaceous-peony-garden-design_11834.jpg', types: ['Բաց վարդագույն', 'Մուգ վարդագույն'] },
+            { id: 7, name: 'Գերբերա', img: 'https://s.list.am/f/406/92276406.webp', types: ['Նարնջագույն', 'Դեղին'] },
+            { id: 8, name: 'Մեխակ', img: 'https://servicememorial.com/wp-content/uploads/2025/07/913kpwCnm8L._AC_SL1500_-300x300.jpg', types: ['Կարմիր', 'Սպիտակ'] },
+            { id: 13, name: 'Քրիզանթեմ', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGd_PlJYQgtGs6W5RIOZeHfAJX3HEE4dNPcg&s', types: ['Սպիտակ', 'Դեղին'] },
+            { id: 14, name: 'Շուշան', img: 'https://168.am/wp-content/uploads/2021/08/shushan.jpg', types: ['Սպիտակ'] },
+            { id: 17, name: 'Անմոռուկ', img: 'https://168.am/wp-content/uploads/2015/09/anmoruk1.jpg', types: ['Կապույտ'] },
+            { id: 18, name: 'Նարգիզ', img: 'https://hayfermer.am/uploads/posts/2017-07/1499609269_narciss-2.jpg', types: ['Դեղին'] }
+        ];
+
+        const greenhouses = Array.from({ length: 80 }, (_, i) => ({
+            id: i + 1, name: `Ջերմոց #${i + 1}`, region: ["Արարատ", "Արմավիր", "Կոտայք", "Երևան", "Լոռի"][i % 5]
+        }));
+
+        let inventory = JSON.parse(localStorage.getItem('gh_db_v10')) || {};
+        let cart = [];
+        let selF = "", selT = "", isAdmin = false;
+
+        function renderFlowers() {
+            const grid = document.getElementById('flowersGrid');
+            grid.innerHTML = flowers.map(f => `
+                <div class="flower-card" onclick="openModal('${f.name}')">
+                    <img src="${f.img}" class="flower-img">
+                    <div class="flower-info"><h3>${f.name}</h3><p>${f.types.length} տեսակ</p></div>
+                </div>
+            `).join('');
+        }
+
+        function openModal(name) {
+            selF = name;
+            const f = flowers.find(fl => fl.name === name);
+            document.getElementById('modalTitle').innerText = name;
+            document.getElementById('typesList').innerHTML = f.types.map(t => `<button class="type-btn" onclick="selectType('${t}')">${t} ${name}</button>`).join('');
+            document.getElementById('typeModal').style.display = 'flex';
+        }
+
+        function selectType(t) {
+            selT = t; closeModal();
+            document.getElementById('flowerSection').classList.add('hidden');
+            document.getElementById('ghSection').classList.remove('hidden');
+            document.getElementById('ghTitle').innerText = `${selT} ${selF}`;
+            renderGH();
+        }
+
+        function renderGH() {
+            const grid = document.getElementById('ghGrid');
+            grid.innerHTML = greenhouses.map(gh => {
+                const key = `${gh.id}_${selT}_${selF}`;
+                const data = inventory[key] || { p: 0, q: 0 };
+                return `
+                    <div class="gh-card ${data.q > 0 ? 'available' : ''}">
+                        <strong>${gh.name}</strong> <small>📍 ${gh.region}</small>
+                        <p style="margin-top:10px">Գին: ${data.p} ֏ | Առկա: ${data.q}</p>
+                        ${data.q > 0 ? `<button class="btn" style="background:#28a745; color:white; width:100%; margin-top:10px" onclick="addToCart(${gh.id}, '${gh.name}', ${data.p})">🛒 Ավելացնել</button>` : '<p style="color:red">Չկա</p>'}
+                        <div class="admin-box">
+                            <input type="number" id="ap_${gh.id}" placeholder="Գին" value="${data.p}" style="width:45%">
+                            <input type="number" id="aq_${gh.id}" placeholder="Քանակ" value="${data.q}" style="width:45%">
+                            <button onclick="saveAdminData(${gh.id})" style="width:100%; background:#764ba2; color:white; border:none; padding:5px; margin-top:5px; border-radius:5px">Պահպանել</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addToCart(ghId, ghName, price) {
+            const existing = cart.find(i => i.ghId === ghId && i.type === selT && i.flower === selF);
+            if (existing) { existing.qty++; } 
+            else { cart.push({ ghId, ghName, price, flower: selF, type: selT, qty: 1 }); }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            document.getElementById('totalPrice').innerText = total;
+            document.getElementById('modalTotal').innerText = total;
+            renderCartModal();
+        }
+
+        function renderCartModal() {
+            const list = document.getElementById('cartItemsList');
+            if (cart.length === 0) { list.innerHTML = "Զամբյուղը դատարկ է:"; return; }
+            list.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <strong>${item.type} ${item.flower}</strong><br>
+                        <small>${item.ghName} - ${item.price} ֏</small>
+                    </div>
+                    <div class="cart-item-qty">
+                        <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
+                        <span>${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                        <button onclick="removeItem(${index})" style="border:none; background:none; color:red; margin-left:10px; cursor:pointer">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty < 1) removeItem(index);
+            updateCartUI();
+        }
+
+        function removeItem(index) { cart.splice(index, 1); updateCartUI(); }
+        function openCart() { document.getElementById('cartModal').style.display = 'flex'; renderCartModal(); }
+        function closeCart() { document.getElementById('cartModal').style.display = 'none'; }
+
+        function checkout(platform) {
+            if (cart.length === 0) return alert("Զամբյուղը դատարկ է:");
+            let text = "🌸 *Պատվեր GreenHouse.am-ից*%0A%0A";
+            cart.forEach(i => text += `🔹 ${i.type} ${i.flower} (${i.ghName})%0A   ${i.qty} հատ x ${i.price} ֏ = ${i.qty * i.price} ֏%0A`);
+            text += `%0A💰 *Ընդհանուր՝ ${document.getElementById('totalPrice').innerText} ֏*`;
+
+            if (platform === 'tg') window.open(`https://t.me/share/url?url=${text}`);
+            if (platform === 'wa') window.open(`https://wa.me/?text=${text}`);
+            if (platform === 'vb') window.open(`viber://forward?text=${text}`);
+        }
+
+        function saveAdminData(id) {
+            const p = document.getElementById(`ap_${id}`).value;
+            const q = document.getElementById(`aq_${id}`).value;
+            inventory[`${id}_${selT}_${selF}`] = { p: parseInt(p), q: parseInt(q) };
+            localStorage.setItem('gh_db_v10', JSON.stringify(inventory));
+            renderGH();
+        }
+
+        function toggleAdmin() {
+            if (!isAdmin && prompt("Գաղտնաբառ:") === "admin.greenhouse.123") { isAdmin = true; document.body.classList.add('admin-mode'); } 
+            else { isAdmin = false; document.body.classList.remove('admin-mode'); }
+        }
+
+        function showFlowers() { document.getElementById('flowerSection').classList.remove('hidden'); document.getElementById('ghSection').classList.add('hidden'); }
+        function closeModal() { document.getElementById('typeModal').style.display = 'none'; }
+        function logout() { localStorage.removeItem('loggedIn'); window.location.href = 'index.html'; }
+
+        renderFlowers();
+
+        document.getElementById('userEmail').textContent = localStorage.getItem('username') + "@gmail.com";
+    </script>
+</body>
+</html>
