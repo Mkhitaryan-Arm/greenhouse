@@ -1,127 +1,2179 @@
 <!DOCTYPE html>
 <html lang="hy">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Մուտք / Գրանցում - GreenHouse.am</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-        }
-        .login-card {
-            background: white; padding: 40px; border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 400px; text-align: center;
-        }
-        .logo { color: #764ba2; font-size: 28px; font-weight: bold; margin-bottom: 20px; display: block; }
-        h2 { margin-bottom: 25px; color: #333; font-size: 20px; }
-        input {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            border: 2px solid #f0f0f0; border-radius: 10px; outline: none; transition: 0.3s;
-        }
-        input:focus { border-color: #764ba2; }
-        .btn {
-            width: 100%; padding: 12px; border: none; border-radius: 10px;
-            background: #764ba2; color: white; font-size: 16px; font-weight: bold;
-            cursor: pointer; transition: 0.3s; margin-bottom: 10px;
-        }
-        .btn:hover { background: #5a368c; transform: translateY(-1px); }
-        .toggle-link { color: #764ba2; cursor: pointer; font-size: 14px; text-decoration: underline; }
-        .error { color: #e74c3c; font-size: 14px; margin-bottom: 15px; display: none; padding: 10px; background: #fdf2f2; border-radius: 5px; }
-        .success { color: #27ae60; font-size: 14px; margin-bottom: 15px; display: none; padding: 10px; background: #f2fdf5; border-radius: 5px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloraEx — Ծաղկային Բորսա</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold: #b8965a; --gold-l: #d4b07a; --gold-xl: #f0ddb0; --gold-d: #7a5e30;
+  --gold-bg: rgba(184,150,90,0.08); --gold-border: rgba(184,150,90,0.2);
+  --bg: #0d0e0b; --bg2: #121410; --bg3: #181c14; --bg4: #1e2419; --bg5: #242c1e;
+  --surf: #1a1f16; --surf2: #202620; --surf3: #282f22;
+  --bdr: rgba(255,255,255,0.07); --bdr2: rgba(255,255,255,0.12); --bdr3: rgba(255,255,255,0.2);
+  --tx: #e8e2d4; --tx2: #a09880; --tx3: #5c5848;
+  --green: #4d8c5e; --green-l: #6db87e; --green-bg: rgba(77,140,94,0.12); --green-bdr: rgba(77,140,94,0.3);
+  --red: #9b4040; --red-l: #c96060; --red-bg: rgba(155,64,64,0.12); --red-bdr: rgba(155,64,64,0.3);
+  --blue: #3d6b9e; --blue-l: #5d8fc4; --blue-bg: rgba(61,107,158,0.12); --blue-bdr: rgba(61,107,158,0.3);
+  --amber: #c49a3a; --amber-bg: rgba(196,154,58,0.12);
+  --r4: 4px; --r6: 6px; --r8: 8px; --r10: 10px; --r14: 14px; --r20: 20px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+html { background: var(--bg); color: var(--tx); font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.6; }
+body { min-height: 100vh; overflow-x: hidden; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius: 2px; }
+
+/* ── Մուտքի էկրան ── */
+.login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); position: relative; overflow: hidden; }
+.login-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(184,150,90,0.06) 0%, transparent 70%); pointer-events: none; }
+.login-box { width: 380px; max-width: 94vw; background: var(--bg2); border: 1px solid var(--bdr2); border-radius: var(--r14); padding: 2.5rem 2rem; position: relative; z-index: 1; box-shadow: 0 24px 64px rgba(0,0,0,0.6); }
+.login-brand { text-align: center; margin-bottom: 2rem; }
+.login-icon { width: 52px; height: 52px; background: linear-gradient(135deg, var(--gold), var(--gold-d)); border-radius: var(--r10); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #1a1004; font-family: 'Playfair Display', serif; margin: 0 auto 1rem; }
+.login-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--gold); letter-spacing: 0.01em; }
+.login-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: var(--tx3); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+.login-error { background: var(--red-bg); border: 1px solid var(--red-bdr); border-radius: var(--r8); padding: 0.65rem 0.9rem; font-size: 0.78rem; color: var(--red-l); margin-bottom: 1rem; text-align: center; }
+.login-hint { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--bdr); text-align: center; }
+
+/* ── Ծրագրի կեղև ── */
+.app-shell { display: grid; grid-template-rows: 56px 1fr; min-height: 100vh; }
+.topbar { background: var(--bg2); border-bottom: 1px solid var(--bdr); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; position: sticky; top: 0; z-index: 50; }
+.body-layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 56px); }
+.sidebar { background: var(--bg2); border-right: 1px solid var(--bdr); padding: 1.25rem 0.75rem; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.content { padding: 2rem; overflow-y: auto; background: var(--bg3); }
+
+/* ── Ապրանքանիշ ── */
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--gold), var(--gold-d)); border-radius: var(--r6); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #1a1004; font-family: 'Playfair Display', serif; letter-spacing: -0.5px; }
+.brand-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--gold); letter-spacing: 0.01em; }
+.brand-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--tx3); letter-spacing: 0.08em; margin-top: -4px; }
+
+/* ── Վերին տող ── */
+.topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+.cart-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--bdr); border-radius: var(--r6); cursor: pointer; font-size: 0.8rem; color: var(--tx2); transition: all 0.18s; background: transparent; }
+.cart-btn:hover, .cart-btn.has-items { border-color: var(--gold-border); color: var(--gold); }
+.cart-badge { background: var(--gold); color: #1a1004; border-radius: 10px; font-size: 0.65rem; font-family: 'IBM Plex Mono', monospace; padding: 1px 5px; font-weight: 600; min-width: 18px; text-align: center; }
+.user-pill { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border: 1px solid var(--bdr); border-radius: var(--r20); background: var(--surf); }
+.avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600; flex-shrink: 0; }
+.av-admin { background: var(--gold-bg); color: var(--gold); }
+.av-seller { background: var(--green-bg); color: var(--green-l); }
+.av-buyer { background: var(--blue-bg); color: var(--blue-l); }
+.user-name { font-size: 0.78rem; font-weight: 500; }
+.user-role { font-size: 0.62rem; font-family: 'IBM Plex Mono', monospace; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.06em; }
+.logout-btn { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--bdr); border-radius: var(--r6); cursor: pointer; font-size: 0.75rem; color: var(--tx3); transition: all 0.18s; background: transparent; }
+.logout-btn:hover { border-color: var(--red-bdr); color: var(--red-l); }
+
+/* ── Կողային ընտրացանկ ── */
+.nav-group-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tx3); padding: 0.8rem 0.75rem 0.3rem; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 0.55rem 0.75rem; border-radius: var(--r6); cursor: pointer; transition: all 0.15s; color: var(--tx2); font-size: 0.82rem; border: 1px solid transparent; }
+.nav-item:hover { background: var(--surf); color: var(--tx); }
+.nav-item.active { background: var(--surf2); color: var(--gold); border-color: var(--gold-border); }
+.nav-badge { margin-left: auto; background: var(--red-bg); color: var(--red-l); border: 1px solid var(--red-bdr); border-radius: 10px; font-size: 0.6rem; font-family: 'IBM Plex Mono', monospace; padding: 1px 5px; min-width: 16px; text-align: center; }
+.nav-badge.gold { background: var(--gold-bg); color: var(--gold); border-color: var(--gold-border); }
+.sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--bdr); }
+.commission-widget { padding: 0.75rem; background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r8); margin: 0.5rem 0; }
+.comm-track { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.comm-track input[type=range] { flex: 1; height: 2px; accent-color: var(--gold); }
+
+/* ── Էջի վերնագիր ── */
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.75rem; gap: 1rem; }
+.page-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-style: italic; font-weight: 400; color: var(--tx); line-height: 1.2; }
+.page-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--tx3); margin-top: 4px; letter-spacing: 0.04em; }
+.page-actions { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; }
+
+/* ── Վիճակագրություն ── */
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.75rem; }
+.stat-card { background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r10); padding: 1.1rem 1.25rem; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent, var(--gold)), transparent); opacity: 0.5; }
+.stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--tx3); margin-bottom: 0.4rem; }
+.stat-val { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 400; color: var(--tx); }
+.stat-val.gold { color: var(--gold); }
+.stat-val.green { color: var(--green-l); }
+.stat-val.red { color: var(--red-l); }
+.stat-val.blue { color: var(--blue-l); }
+.stat-meta { font-size: 0.7rem; color: var(--tx3); margin-top: 3px; }
+
+/* ── Քարտեր ── */
+.card { background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r10); padding: 1.4rem; }
+.card-bare { background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r10); overflow: hidden; }
+.section-label { font-family: 'Playfair Display', serif; font-size: 1rem; font-style: italic; color: var(--tx); margin-bottom: 1rem; }
+
+/* ── Կոճակներ ── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0.5rem 1.1rem; border-radius: var(--r6); font-size: 0.8rem; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; letter-spacing: 0.01em; white-space: nowrap; }
+.btn-primary { background: var(--gold); color: #1a1004; font-weight: 600; }
+.btn-primary:hover { background: var(--gold-l); }
+.btn-sec { background: var(--surf2); color: var(--tx); border: 1px solid var(--bdr2); }
+.btn-sec:hover { background: var(--surf3); border-color: var(--bdr3); }
+.btn-ghost { background: transparent; color: var(--tx2); border: 1px solid var(--bdr); }
+.btn-ghost:hover { background: var(--surf); color: var(--tx); }
+.btn-danger { background: var(--red-bg); color: var(--red-l); border: 1px solid var(--red-bdr); }
+.btn-danger:hover { background: rgba(155,64,64,0.22); }
+.btn-success { background: var(--green-bg); color: var(--green-l); border: 1px solid var(--green-bdr); }
+.btn-success:hover { background: rgba(77,140,94,0.22); }
+.btn-info { background: var(--blue-bg); color: var(--blue-l); border: 1px solid var(--blue-bdr); }
+.btn-info:hover { background: rgba(61,107,158,0.22); }
+.btn-sm { padding: 0.3rem 0.75rem; font-size: 0.73rem; }
+.btn-xs { padding: 0.2rem 0.55rem; font-size: 0.68rem; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Մուտքագրման դաշտեր ── */
+.input { width: 100%; background: var(--bg4); border: 1px solid var(--bdr); border-radius: var(--r6); padding: 0.55rem 0.85rem; color: var(--tx); font-family: 'DM Sans', sans-serif; font-size: 0.82rem; outline: none; transition: border-color 0.18s; }
+.input:focus { border-color: var(--gold-border); }
+.input::placeholder { color: var(--tx3); }
+select.input option { background: var(--bg4); color: var(--tx); }
+textarea.input { resize: vertical; }
+.label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tx2); margin-bottom: 4px; display: block; }
+.form-group { display: flex; flex-direction: column; gap: 0; margin-bottom: 0.9rem; }
+.fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.fg3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+
+/* ── Պիտակներ ── */
+.badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 20px; font-size: 0.67rem; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.04em; white-space: nowrap; }
+.bg-gold { background: var(--gold-bg); color: var(--gold); border: 1px solid var(--gold-border); }
+.bg-green { background: var(--green-bg); color: var(--green-l); border: 1px solid var(--green-bdr); }
+.bg-red { background: var(--red-bg); color: var(--red-l); border: 1px solid var(--red-bdr); }
+.bg-blue { background: var(--blue-bg); color: var(--blue-l); border: 1px solid var(--blue-bdr); }
+.bg-gray { background: rgba(92,88,72,0.15); color: var(--tx2); border: 1px solid var(--bdr); }
+.bg-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(196,154,58,0.3); }
+
+/* ── Աղյուսակներ ── */
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th { text-align: left; padding: 0.55rem 1rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tx3); border-bottom: 1px solid var(--bdr); font-weight: 400; }
+.tbl td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--bdr); font-size: 0.82rem; vertical-align: middle; }
+.tbl tbody tr:last-child td { border-bottom: none; }
+.tbl tbody tr:hover { background: rgba(184,150,90,0.03); }
+
+/* ── Գաղտնաբառի բջիջ ── */
+.pw-cell { display: flex; align-items: center; gap: 6px; }
+.pw-mask { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--tx3); letter-spacing: 0.05em; }
+.pw-reveal { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--gold); letter-spacing: 0.05em; }
+.pw-toggle { cursor: pointer; color: var(--tx3); font-size: 0.7rem; padding: 2px 5px; border: 1px solid var(--bdr); border-radius: 4px; transition: all 0.15s; background: transparent; white-space: nowrap; }
+.pw-toggle:hover { border-color: var(--gold-border); color: var(--gold); }
+
+/* ── Ծաղկի քարտեր ── */
+.flower-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.1rem; }
+.fcard { background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r14); overflow: hidden; transition: all 0.22s; display: flex; flex-direction: column; }
+.fcard:hover { border-color: var(--bdr2); transform: translateY(-2px); box-shadow: var(--shadow); }
+.fcard.pending { opacity: 0.6; }
+.fcard-img-inner { width: 100%; height: 170px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--bg4), var(--bg5)); font-size: 2.5rem; }
+.fcard-body { padding: 0.9rem; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.fcard-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-style: italic; color: var(--tx); line-height: 1.25; }
+.fcard-price { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); margin-top: auto; }
+.fcard-foot { padding: 0.65rem 0.9rem; border-top: 1px solid var(--bdr); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+
+/* ── Պատվերի քարտեր ── */
+.order-card { background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r10); padding: 1.1rem; margin-bottom: 0.75rem; transition: border-color 0.18s; }
+.order-card:hover { border-color: var(--bdr2); }
+.order-card.clickable { cursor: pointer; }
+.order-items { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--bdr); }
+
+/* ── Զամбьyuɣ կողային պատուհան ── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 100; backdrop-filter: blur(3px); }
+.drawer { position: fixed; top: 0; right: 0; height: 100%; width: 400px; background: var(--bg2); border-left: 1px solid var(--bdr); z-index: 101; display: flex; flex-direction: column; }
+.drawer-head { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--bdr); display: flex; justify-content: space-between; align-items: center; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.65rem; }
+.drawer-foot { padding: 1.25rem 1.5rem; border-top: 1px solid var(--bdr); }
+.cart-item { background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r10); padding: 0.85rem; display: flex; gap: 0.75rem; align-items: center; }
+.ci-img { width: 48px; height: 48px; border-radius: var(--r6); background: var(--bg5); flex-shrink: 0; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.qty-ctrl { display: flex; align-items: center; background: var(--bg4); border: 1px solid var(--bdr); border-radius: var(--r6); overflow: hidden; }
+.qty-btn { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; background: none; color: var(--tx2); font-size: 1rem; transition: all 0.15s; }
+.qty-btn:hover { background: var(--surf2); color: var(--gold); }
+.qty-val { width: 28px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--tx); }
+
+/* ── Երկխոսություն պատուհաններ ── */
+.modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 1rem; }
+.modal { background: var(--bg2); border: 1px solid var(--bdr); border-radius: var(--r14); padding: 1.75rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+.modal-lg { max-width: 620px; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-style: italic; color: var(--gold); margin-bottom: 1.25rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--bdr); }
+
+/* ── Ծանուցումներ ── */
+.toast-stack { position: fixed; bottom: 1.25rem; right: 1.25rem; z-index: 300; display: flex; flex-direction: column; gap: 0.5rem; width: 300px; }
+.toast { background: var(--surf2); border: 1px solid var(--bdr2); border-radius: var(--r10); padding: 0.8rem 1rem; font-size: 0.8rem; display: flex; gap: 8px; align-items: flex-start; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+.toast.success { border-color: var(--green-bdr); background: rgba(77,140,94,0.15); }
+.toast.error { border-color: var(--red-bdr); background: rgba(155,64,64,0.15); }
+.toast.info { border-color: var(--gold-border); }
+
+/* ── Առաքման հետևիչ ── */
+.delivery-track { display: flex; align-items: flex-start; margin: 1rem 0; position: relative; }
+.dstep { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+.dstep-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--bdr2); background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; margin-bottom: 6px; transition: all 0.3s; }
+.dstep-dot.done { background: var(--gold); border-color: var(--gold); color: #1a1004; font-weight: 700; }
+.dstep-dot.active { background: var(--gold-bg); border-color: var(--gold); color: var(--gold); }
+.dstep-label { font-size: 0.65rem; font-family: 'IBM Plex Mono', monospace; color: var(--tx3); text-align: center; line-height: 1.3; }
+.dstep-label.active { color: var(--gold); }
+.dstep-label.done { color: var(--tx2); }
+.dline { position: absolute; top: 10px; left: 50%; right: -50%; height: 1px; background: var(--bdr2); z-index: 0; }
+.dline.done { background: var(--gold-d); }
+
+/* ── Բար գծագրություն ── */
+.bar-chart-wrap { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
+.bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
+.bar-col { width: 100%; border-radius: 3px 3px 0 0; background: var(--gold-bg); border: 1px solid var(--gold-border); border-bottom: none; position: relative; overflow: hidden; min-height: 3px; }
+.bar-col .bar-fill { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, var(--gold-d), var(--gold)); height: 100%; }
+.bar-label { font-size: 0.6rem; font-family: 'IBM Plex Mono', monospace; color: var(--tx3); text-align: center; flex-shrink: 0; }
+.bar-val-label { font-size: 0.58rem; font-family: 'IBM Plex Mono', monospace; color: var(--tx3); text-align: center; flex-shrink: 0; }
+
+/* ── Բանակցությունների շղթա ── */
+.neg-thread { display: flex; flex-direction: column; gap: 0.75rem; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+.neg-msg { display: flex; gap: 8px; }
+.neg-msg.mine { flex-direction: row-reverse; }
+.neg-bubble { background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r8); padding: 0.6rem 0.85rem; max-width: 70%; font-size: 0.8rem; }
+.neg-bubble.mine { background: var(--gold-bg); border-color: var(--gold-border); }
+.neg-meta { font-size: 0.62rem; font-family: 'IBM Plex Mono', monospace; color: var(--tx3); margin-top: 2px; text-align: right; }
+.neg-meta.mine { text-align: left; }
+
+/* ── Բաժանորդագրման ընտրանքներ ── */
+.sub-freq { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+.sub-opt { padding: 0.6rem; border: 1px solid var(--bdr); border-radius: var(--r8); text-align: center; cursor: pointer; transition: all 0.18s; font-size: 0.75rem; }
+.sub-opt:hover { border-color: var(--bdr2); }
+.sub-opt.active { border-color: var(--gold); background: var(--gold-bg); color: var(--gold); }
+
+/* ── Հավատարմագրերի տուփ ── */
+.creds-box { background: var(--bg4); border: 1px solid var(--gold-border); border-radius: var(--r8); padding: 0.85rem 1rem; margin-top: 0.75rem; }
+.creds-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.8rem; }
+.creds-key { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.07em; }
+.creds-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--gold); }
+
+/* ── Օգտակար դասեր ── */
+.flex { display: flex; }
+.aic { align-items: center; }
+.jcb { justify-content: space-between; }
+.g1 { gap: 0.5rem; }
+.g2 { gap: 1rem; }
+.mt1 { margin-top: 0.5rem; }
+.mt2 { margin-top: 1rem; }
+.mb1 { margin-bottom: 0.5rem; }
+.mb2 { margin-bottom: 1rem; }
+.w100 { width: 100%; }
+.tr { text-align: right; }
+.tgold { color: var(--gold); }
+.tgreen { color: var(--green-l); }
+.tred { color: var(--red-l); }
+.tblue { color: var(--blue-l); }
+.tmuted { color: var(--tx2); }
+.tdim { color: var(--tx3); }
+.tsm { font-size: 0.78rem; }
+.txs { font-size: 0.7rem; }
+.tmono { font-family: 'IBM Plex Mono', monospace; }
+.tserif { font-family: 'Playfair Display', serif; font-style: italic; }
+.divider { border: none; border-top: 1px solid var(--bdr); margin: 1.25rem 0; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3.5rem 2rem; color: var(--tx3); gap: 0.75rem; text-align: center; }
+.empty-icon { font-size: 2.2rem; opacity: 0.35; }
+.empty-text { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; }
+.pill-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.info-ribbon { background: var(--gold-bg); border: 1px solid var(--gold-border); border-radius: var(--r8); padding: 0.7rem 1rem; font-size: 0.78rem; display: flex; gap: 8px; align-items: flex-start; }
+.alert-red { background: var(--red-bg); border: 1px solid var(--red-bdr); border-radius: var(--r8); padding: 0.7rem 1rem; font-size: 0.78rem; color: var(--red-l); }
+
+/* ── Անցումներ ── */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.22s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+.slide-enter-active, .slide-leave-active { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s; }
+.slide-enter-from, .slide-leave-to { transform: translateX(100%); opacity: 0; }
+
+/* ── Վերականգնման կոճակ ── */
+.reset-btn { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border: 1px solid var(--bdr); border-radius: var(--r6); cursor: pointer; font-size: 0.65rem; color: var(--tx3); transition: all 0.18s; background: transparent; font-family: 'IBM Plex Mono', monospace; }
+.reset-btn:hover { border-color: var(--red-bdr); color: var(--red-l); }
+
+/* ── Պատվերի մանրամաuն ── */
+.order-summary-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--bdr); font-size: 0.82rem; }
+.order-summary-row:last-child { border-bottom: none; }
+.order-total-box { background: var(--bg4); border: 1px solid var(--gold-border); border-radius: var(--r8); padding: 0.9rem 1.1rem; margin-top: 1rem; }
+</style>
 </head>
 <body>
+<div id="app">
 
-    <div class="login-card" id="authBox">
-        <span class="logo">🌸 GreenHouse.am</span>
-        
-        <div id="loginSection">
-            <h2>Մուտք հաճախորդի համար</h2>
-            <div id="loginError" class="error">Սխալ տվյալներ</div>
-            <input type="text" id="loginUser" placeholder="Օգտանուն">
-            <input type="password" id="loginPass" placeholder="Գաղտնաբառ">
-            <button class="btn" onclick="handleLogin()">Մուտք Գործել</button>
-            <p style="font-size: 14px;">Չունե՞ք հաշիվ: <span class="toggle-link" onclick="toggleAuth()">Գրանցվեք այստեղ</span></p>
-        </div>
+  <!-- ── Ծանուցումների կույտ ── -->
+  <div class="toast-stack">
+    <transition-group name="fade">
+      <div v-for="t in toasts" :key="t.id" :class="['toast', t.type]">
+        <span style="flex-shrink:0">{{ t.icon }}</span>
+        <span style="flex:1;line-height:1.4">{{ t.text }}</span>
+        <span @click="killToast(t.id)" style="cursor:pointer;color:var(--tx3);font-size:1rem;line-height:1">✕</span>
+      </div>
+    </transition-group>
+  </div>
 
-        <div id="regSection" style="display: none;">
-            <h2>Ստեղծել նոր հաշիվ</h2>
-            <div id="regError" class="error">Այս անունով օգտատեր արդեն կա</div>
-            <div id="regSuccess" class="success">Գրանցումը հաջողվեց: Հիմա կարող եք մուտք գործել:</div>
-            <input type="text" id="regUser" placeholder="Ընտրեք օգտանուն">
-            <input type="password" id="regPass" placeholder="Ընտրեք գաղտնաբառ">
-            <button class="btn" style="background: #27ae60;" onclick="handleRegister()">Գրանցվել</button>
-            <p style="font-size: 14px;">Արդեն ունե՞ք հաշիվ: <span class="toggle-link" onclick="toggleAuth()">Մուտք գործեք</span></p>
+  <!-- ══════════ ՄՈՒՏՔ ══════════ -->
+  <transition name="fade">
+    <div v-if="!currentUser" class="login-screen">
+      <div class="login-bg"></div>
+      <div class="login-box">
+        <div class="login-brand">
+          <div class="login-icon">Ծ</div>
+          <div class="login-title">FloraEx</div>
+          <div class="login-sub">Ծաղկային Բորսա · B2B · Հայաստան</div>
         </div>
+        <div v-if="loginError" class="login-error">{{ loginError }}</div>
+        <div class="form-group">
+          <label class="label">Մուտքանուն</label>
+          <input class="input" v-model="loginForm.username" placeholder="օրինակ՝ masis" @keyup.enter="doLogin" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="label">Գաղտնաբառ</label>
+          <input class="input" type="password" v-model="loginForm.password" placeholder="••••••••" @keyup.enter="doLogin" autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary w100" style="padding:0.75rem;font-size:0.88rem;margin-top:0.5rem" @click="doLogin">
+          Մուտք Գործել →
+        </button>
+        <div class="login-hint">
+          <div class="txs tdim tmono" style="margin-bottom:0.5rem">ԴԵՄՈ ՀԱՇԻՎՆԵՐ</div>
+          <div class="txs tdim">Ադմին · <span class="tgold tmono">admin / admin123</span></div>
+          <div class="txs tdim">Վաճառող · <span class="tgold tmono">masis / masis123</span></div>
+          <div class="txs tdim">Գնորդ · <span class="tgold tmono">yfs / yfs123</span></div>
+        </div>
+      </div>
     </div>
+  </transition>
 
-    <script>
-        // Վերցնում ենք գրանցված օգտատերերին localStorage-ից կամ ստեղծում դատարկ ցուցակ
-        let users = JSON.parse(localStorage.getItem('gh_users')) || [];
+  <!-- ══════════ ՀԻՄՆԱԿԱՆ ԾՐԱԳԻՐ ══════════ -->
+  <transition name="fade">
+    <div v-if="currentUser" class="app-shell">
 
-        // Ավելացնում ենք դեֆոլտ ադմինին, եթե չկա
-        if (!users.find(u => u.username === "admin")) {
-            users.push({username: "admin", password: "flower123"});
-            localStorage.setItem('gh_users', JSON.stringify(users));
+      <!-- ── Զամбьyuɣ-ի ծածկույթ ── -->
+      <transition name="fade">
+        <div v-if="cartOpen" class="overlay" @click="cartOpen = false"></div>
+      </transition>
+      <transition name="slide">
+        <div v-if="cartOpen" class="drawer">
+          <div class="drawer-head">
+            <div>
+              <div class="tserif" style="font-size:1.1rem;color:var(--gold)">Զամбьyuɣ</div>
+              <div class="txs tmono tdim" style="margin-top:2px">{{ cartCount }} ապрanq · {{ fmtAMD(cartTotal) }}</div>
+            </div>
+            <button class="btn btn-ghost" @click="cartOpen = false" style="font-size:1.2rem;padding:0.3rem 0.6rem">×</button>
+          </div>
+          <div class="drawer-body">
+            <div v-if="cartCount === 0" class="empty-state">
+              <div class="empty-icon">🌿</div>
+              <div class="empty-text">Զամбьyuɣ-ը դատарик е</div>
+            </div>
+            <div v-for="item in cartItems" :key="item.flowerId" class="cart-item">
+              <div class="ci-img">
+                <img v-if="item.image" :src="item.image" style="width:100%;height:100%;object-fit:cover" @error="e => e.target.style.display='none'">
+                <span v-else>🌸</span>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div class="tsm" style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ item.name }}</div>
+                <div class="txs tdim">{{ fmtAMD(item.price) }} / հատ</div>
+                <div class="txs tgold">{{ fmtAMD(item.price * item.qty) }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                <div class="qty-ctrl">
+                  <button class="qty-btn" @click="updQty(item.flowerId, -1)">−</button>
+                  <span class="qty-val">{{ item.qty }}</span>
+                  <button class="qty-btn" @click="updQty(item.flowerId, 1)">+</button>
+                </div>
+                <span @click="removeFromCart(item.flowerId)" class="txs" style="color:var(--red-l);cursor:pointer">Հеracel</span>
+              </div>
+            </div>
+            <!-- Բаžhнordagrutyan entranq -->
+            <div v-if="cartCount > 0" class="card" style="margin-top:0.5rem;padding:0.9rem">
+              <div class="tsm" style="font-weight:500;margin-bottom:6px">🔄 Կрknvoɣ Patver</div>
+              <div class="sub-freq">
+                <div v-for="f in ['Шабаthakan', 'Erkшабаthakan', 'Amsakan']" :key="f"
+                     :class="['sub-opt', cartSubscription === f ? 'active' : '']"
+                     @click="cartSubscription = (cartSubscription === f ? null : f)">
+                  {{ f }}
+                </div>
+              </div>
+              <div v-if="cartSubscription" class="txs tdim mt1">Аvtomат {{ cartSubscription.toLowerCase() }} — админн hastatowm е</div>
+            </div>
+          </div>
+          <div v-if="cartCount > 0" class="drawer-foot">
+            <div class="flex jcb aic" style="margin-bottom:0.75rem">
+              <span class="tsm tmuted">Yndameny</span>
+              <span class="tserif" style="font-size:1.4rem;color:var(--gold)">{{ fmtAMD(cartTotal) }}</span>
+            </div>
+            <button class="btn btn-primary w100" style="padding:0.8rem;font-size:0.88rem" @click="checkout">
+              Dzevakerpel Patverı →
+              <span v-if="cartSubscription" class="badge bg-gold" style="margin-left:4px">{{ cartSubscription }}</span>
+            </button>
+            <button class="btn btn-ghost w100" style="margin-top:0.4rem;font-size:0.73rem" @click="clearCart">Маqrel Zambyughin</button>
+          </div>
+        </div>
+      </transition>
+
+      <!-- ── Ծاɣik Avelacnelu Patuhan ── -->
+      <transition name="fade">
+        <div v-if="modals.addFlower" class="modal-wrap" @click.self="modals.addFlower = false">
+          <div class="modal">
+            <div class="modal-title">Аvelacnel Dzaɣik</div>
+            <div class="form-group">
+              <label class="label">Dzaɣki Anun *</label>
+              <input class="input" v-model="flowerForm.name" placeholder="օр. Karmir Vard Naomi">
+            </div>
+            <div class="fg2">
+              <div class="form-group">
+                <label class="label">Ɣin (֏) *</label>
+                <input class="input" type="number" v-model.number="flowerForm.price" placeholder="1200">
+              </div>
+              <div class="form-group">
+                <label class="label">Nvaz. Patver (hat)</label>
+                <input class="input" type="number" v-model.number="flowerForm.minOrder" placeholder="10">
+              </div>
+            </div>
+            <div class="fg2">
+              <div class="form-group">
+                <label class="label">Kategoria</label>
+                <select class="input" v-model="flowerForm.category">
+                  <option value="rose">🌹 Vard</option>
+                  <option value="lily">🌷 Shushan</option>
+                  <option value="tulip">🌺 Kakach</option>
+                  <option value="orchid">🌸 Kholordz</option>
+                  <option value="sunflower">🌻 Arevadzaghik</option>
+                  <option value="peony">🌼 Baghegh</option>
+                  <option value="mixed">💐 Kharn</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="label">Coɣuni Erkarak (sm)</label>
+                <input class="input" type="number" v-model.number="flowerForm.stemLength" placeholder="60">
+              </div>
+            </div>
+            <div class="fg2">
+              <div class="form-group">
+                <label class="label">Pashar (hat)</label>
+                <input class="input" type="number" v-model.number="flowerForm.stock" placeholder="500">
+              </div>
+              <div class="form-group">
+                <label class="label">Dasaran</label>
+                <select class="input" v-model="flowerForm.grade">
+                  <option value="A">Dasaran Ա</option>
+                  <option value="AA">Dasaran ԱԱ</option>
+                  <option value="AAA">Dasaran ԱԱԱ</option>
+                  <option value="Premium">Premyum</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="label">Nkaragrutyun</label>
+              <textarea class="input" v-model="flowerForm.description" rows="2" placeholder="Tesak, tzagum, hatkunutyunner..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="label">Nkari Hlink</label>
+              <input class="input" v-model="flowerForm.image" placeholder="https://...">
+            </div>
+            <div class="flex g1 jcb" style="margin-top:0.5rem">
+              <button class="btn btn-ghost" @click="modals.addFlower = false">Chegharkel</button>
+              <button class="btn btn-primary" @click="submitFlower">Nerkaycnel →</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- ── Oɣtater Avelacnelu Patuhan ── -->
+      <transition name="fade">
+        <div v-if="modals.addUser" class="modal-wrap" @click.self="closeAddUser">
+          <div class="modal">
+            <div class="modal-title">{{ newPartnerCreds ? 'Gordzakits Stextsvatʿ е' : 'Grancvel Gordzakits' }}</div>
+            <template v-if="!newPartnerCreds">
+              <div class="form-group">
+                <label class="label">Anun *</label>
+                <input class="input" v-model="userForm.name" placeholder="Masis Jermots">
+              </div>
+              <div class="fg2">
+                <div class="form-group">
+                  <label class="label">Der</label>
+                  <select class="input" v-model="userForm.role">
+                    <option value="Seller">🌱 Vachaṙoɣ (Jermots)</option>
+                    <option value="Buyer">🏪 Gnoṙd (Krpak)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="label">Her. Hamar</label>
+                  <input class="input" v-model="userForm.phone" placeholder="+374 99 ...">
+                </div>
+              </div>
+              <div class="fg2">
+                <div class="form-group">
+                  <label class="label">Ел. Ppost</label>
+                  <input class="input" v-model="userForm.email" placeholder="name@example.am">
+                </div>
+                <div class="form-group">
+                  <label class="label">Gtnyvelayi Vayr</label>
+                  <input class="input" v-model="userForm.location" placeholder="Yerevan">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="label">Mutqanunn *</label>
+                <input class="input" v-model="userForm.username" placeholder="login_anun (lat.)">
+              </div>
+              <div class="fg2">
+                <div class="form-group">
+                  <label class="label">Gaɣtnabaṙ *</label>
+                  <input class="input" v-model="userForm.password" placeholder="min 4 nish">
+                </div>
+                <div class="form-group">
+                  <label class="label">Canaothagrutyan</label>
+                  <input class="input" v-model="userForm.notes" placeholder="Lracucich...">
+                </div>
+              </div>
+              <div class="flex g1 jcb" style="margin-top:0.5rem">
+                <button class="btn btn-ghost" @click="closeAddUser">Chegharkel</button>
+                <button class="btn btn-primary" @click="submitUser">Grancvel →</button>
+              </div>
+            </template>
+            <template v-else>
+              <div class="info-ribbon mb2" style="font-size:0.78rem">✅ Gordzakitsı hajoɣutyamb grancvatʿ e. Pahpanekʿ mowqi tvyalnerı.</div>
+              <div class="creds-box">
+                <div class="txs tdim tmono mb1" style="margin-bottom:0.5rem">MOWQI TVYALNER</div>
+                <div class="creds-row"><span class="creds-key">Anun</span><span class="creds-val">{{ newPartnerCreds.name }}</span></div>
+                <div class="creds-row"><span class="creds-key">Der</span><span class="creds-val">{{ newPartnerCreds.role === 'Seller' ? 'Vachaṙoɣ' : 'Gnoṙd' }}</span></div>
+                <div class="creds-row"><span class="creds-key">Mutqanunn</span><span class="creds-val">{{ newPartnerCreds.username }}</span></div>
+                <div class="creds-row"><span class="creds-key">Gaɣtnabaṙ</span><span class="creds-val">{{ newPartnerCreds.password }}</span></div>
+              </div>
+              <div class="flex g1 jcb mt2">
+                <button class="btn btn-ghost" @click="resetAddUserForm">+ Yev Mek</button>
+                <button class="btn btn-primary" @click="closeAddUser">Phakvel</button>
+              </div>
+            </template>
+          </div>
+        </div>
+      </transition>
+
+      <!-- ── Patveri Manramasn Patuhan ── -->
+      <transition name="fade">
+        <div v-if="activeOrder" class="modal-wrap" @click.self="activeOrder = null">
+          <div class="modal modal-lg">
+            <div class="modal-title">
+              Patver #{{ String(activeOrder.id).slice(-5) }}
+              <span style="font-size:0.75rem;color:var(--tx3);font-style:normal"> · {{ formatDate(activeOrder.date) }}</span>
+            </div>
+            <div class="flex jcb aic mb2">
+              <div>
+                <div class="tsm"><strong>{{ getUser(activeOrder.buyerId)?.name || 'Anhayт' }}</strong></div>
+                <div class="txs tdim tmono">{{ getUser(activeOrder.buyerId)?.location || '—' }}</div>
+                <div v-if="activeOrder.subscription" class="badge bg-blue mt1">🔄 {{ activeOrder.subscription }}</div>
+              </div>
+              <span :class="statusBadge(activeOrder.status)">{{ statusLabel(activeOrder.status) }}</span>
+            </div>
+            <!-- Arakmani enthatsum -->
+            <div class="delivery-track">
+              <template v-for="(step, i) in deliverySteps" :key="step.key">
+                <div class="dstep">
+                  <div v-if="i > 0" class="dline" :class="isStepDone(activeOrder.status, step.key) ? 'done' : ''"></div>
+                  <div :class="['dstep-dot', stepClass(activeOrder.status, step.key)]">
+                    {{ isStepDone(activeOrder.status, step.key) ? '✓' : i + 1 }}
+                  </div>
+                  <div :class="['dstep-label', stepClass(activeOrder.status, step.key)]">{{ step.label }}</div>
+                </div>
+              </template>
+            </div>
+            <!-- Apranqner -->
+            <div class="order-items">
+              <div v-for="item in activeOrder.items" :key="item.flowerId" class="order-summary-row">
+                <span>{{ item.name }} <span class="tdim">× {{ item.qty }} hat</span></span>
+                <span class="tgold tmono">{{ fmtAMD(item.price * item.qty) }}</span>
+              </div>
+            </div>
+            <div class="order-total-box">
+              <div class="flex jcb aic" style="margin-bottom:0.4rem">
+                <span class="tsm tmuted">Yndameny</span>
+                <span class="tsm tmono">{{ fmtAMD(activeOrder.total) }}</span>
+              </div>
+              <div class="flex jcb aic" style="margin-bottom:0.4rem">
+                <span class="tsm tmuted">FloraEx Mijndordavchar ({{ commissionRate }}%)</span>
+                <span class="tsm tred tmono">− {{ fmtAMD(Math.round(activeOrder.total * commissionRate / 100)) }}</span>
+              </div>
+              <div class="flex jcb aic" style="padding-top:0.4rem;border-top:1px solid var(--bdr)">
+                <span class="tsm" style="font-weight:500">Makacʿ Vchavatʿ</span>
+                <span class="tserif" style="font-size:1.35rem;color:var(--gold)">{{ fmtAMD(Math.round(activeOrder.total * (1 - commissionRate/100))) }}</span>
+              </div>
+            </div>
+            <!-- Banakutyunner -->
+            <div v-if="activeOrder.negotiations && activeOrder.negotiations.length" style="margin-top:1.25rem">
+              <div class="tsm" style="font-weight:500;margin-bottom:0.5rem">💬 Banakutyunner</div>
+              <div class="neg-thread">
+                <div v-for="msg in activeOrder.negotiations" :key="msg.id"
+                     :class="['neg-msg', msg.fromRole === 'Admin' ? 'mine' : '']">
+                  <div :class="['avatar', avatarCls(msg.fromRole)]" style="width:26px;height:26px;font-size:0.65rem;flex-shrink:0">
+                    {{ msg.fromName[0] }}
+                  </div>
+                  <div>
+                    <div :class="['neg-bubble', msg.fromRole === 'Admin' ? 'mine' : '']">{{ msg.text }}</div>
+                    <div :class="['neg-meta', msg.fromRole === 'Admin' ? 'mine' : '']">{{ msg.fromName }} · {{ formatDate(msg.ts) }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="currentUser.role === 'Admin' || currentUser.role === 'Buyer'" class="flex g1 mt1">
+              <input class="input" v-model="negReply" placeholder="Tzер banahashum..." style="flex:1" @keyup.enter="sendNeg">
+              <button class="btn btn-sec btn-sm" @click="sendNeg">Ugharkel</button>
+            </div>
+            <!-- Admin Status Actions -->
+            <div v-if="currentUser.role === 'Admin'" class="flex g1 mt2" style="flex-wrap:wrap">
+              <button v-if="activeOrder.status === 'Pending'" class="btn btn-success btn-sm" @click="updOrderStatus(activeOrder.id, 'Confirmed')">✓ Hastatel</button>
+              <button v-if="activeOrder.status === 'Confirmed'" class="btn btn-info btn-sm" @click="updOrderStatus(activeOrder.id, 'Shipped')">🚚 Ugharkel</button>
+              <button v-if="activeOrder.status === 'Shipped'" class="btn btn-success btn-sm" @click="updOrderStatus(activeOrder.id, 'Delivered')">✓ Handzel</button>
+              <button v-if="['Pending','Confirmed'].includes(activeOrder.status)" class="btn btn-danger btn-sm" @click="updOrderStatus(activeOrder.id, 'Cancelled')">✕ Chegharkel</button>
+            </div>
+            <div style="margin-top:1rem;text-align:right">
+              <button class="btn btn-ghost btn-sm" @click="activeOrder = null">Phakvel</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- ── Ɣni Banakutyun Modal ── -->
+      <transition name="fade">
+        <div v-if="modals.negotiate" class="modal-wrap" @click.self="modals.negotiate = null">
+          <div class="modal">
+            <div class="modal-title">Ɣni Banakutyun</div>
+            <div class="info-ribbon mb2" style="font-size:0.75rem">
+              Dzaɣki Ɣinı՝ <strong class="tgold">{{ fmtAMD(modals.negotiate?.price) }}</strong> — Arajarkecʿekʿ avelі lav ɣin
+            </div>
+            <div class="form-group">
+              <label class="label">Tzер Arajardzı (֏/hat)</label>
+              <input class="input" type="number" v-model.number="negForm.price" :placeholder="modals.negotiate?.price">
+            </div>
+            <div class="form-group">
+              <label class="label">Qanak (hat)</label>
+              <input class="input" type="number" v-model.number="negForm.qty" placeholder="оp. 500">
+            </div>
+            <div class="form-group">
+              <label class="label">Haghordagutyun</label>
+              <textarea class="input" v-model="negForm.message" rows="3" placeholder="Bacatrecʿekʿ tzер arajardzı..."></textarea>
+            </div>
+            <div class="flex g1 jcb" style="margin-top:0.5rem">
+              <button class="btn btn-ghost" @click="modals.negotiate = null">Chegharkel</button>
+              <button class="btn btn-primary" @click="submitNeg">📩 Ugharkel Arajardzı →</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- ── Vchayman Hayт Modal ── -->
+      <transition name="fade">
+        <div v-if="modals.payout" class="modal-wrap" @click.self="modals.payout = false">
+          <div class="modal">
+            <div class="modal-title">Vchayman Haytarutyun</div>
+            <div class="stat-row" style="grid-template-columns:1fr 1fr;margin-bottom:1rem">
+              <div class="stat-card">
+                <div class="stat-label">Makacʿ Ekamutʿ</div>
+                <div class="stat-val green">{{ fmtAMD(mySellerNet) }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Yndameny Ekamutʿ</div>
+                <div class="stat-val gold">{{ fmtAMD(mySellerRevenue) }}</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="label">Gumar (֏)</label>
+              <input class="input" type="number" v-model.number="payoutForm.amount" :placeholder="mySellerNet">
+            </div>
+            <div class="form-group">
+              <label class="label">Bankay Tvyalner</label>
+              <input class="input" v-model="payoutForm.details" placeholder="IBAN kam h/h">
+            </div>
+            <div class="form-group">
+              <label class="label">Nkati Unecaz</label>
+              <input class="input" v-model="payoutForm.note" placeholder="Ents cankowtʿutyun">
+            </div>
+            <div class="flex g1 jcb" style="margin-top:0.5rem">
+              <button class="btn btn-ghost" @click="modals.payout = false">Chegharkel</button>
+              <button class="btn btn-primary" @click="submitPayout">Ugharkel Haytarutyunı →</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- ══ Verevi Shertq ══ -->
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-icon">Ծ</div>
+          <div>
+            <div class="brand-name">FloraEx</div>
+            <div class="brand-sub">Ծաղկային Բորսա · B2B · ՀՀ</div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button v-if="['Buyer','Admin'].includes(currentUser.role)"
+                  :class="['cart-btn', cartCount > 0 ? 'has-items' : '']"
+                  @click="cartOpen = true">
+            🛒
+            <span class="cart-badge" v-if="cartCount > 0">{{ cartCount }}</span>
+            <span v-else class="tsm tmuted">Zambyuɣ</span>
+          </button>
+          <div class="user-pill">
+            <div :class="['avatar', avatarCls(currentUser.role)]">{{ currentUser.name[0] }}</div>
+            <div>
+              <div class="user-name">{{ currentUser.name }}</div>
+              <div class="user-role">{{ roleLabel(currentUser.role) }}</div>
+            </div>
+          </div>
+          <button class="logout-btn" @click="doLogout">⎋ Elq</button>
+        </div>
+      </header>
+
+      <div class="body-layout">
+        <!-- ══ Kolomak ══ -->
+        <aside class="sidebar">
+          <template v-if="currentUser.role === 'Admin'">
+            <div class="nav-group-label">Karavarcum</div>
+            <div v-for="n in adminNav" :key="n.p"
+                 :class="['nav-item', page === n.p ? 'active' : '']"
+                 @click="page = n.p">
+              <span style="font-size:13px">{{ n.icon }}</span> {{ n.label }}
+              <span v-if="n.badge" :class="['nav-badge', n.badgeType || '']">{{ n.badge }}</span>
+            </div>
+          </template>
+          <template v-if="currentUser.role === 'Seller'">
+            <div class="nav-group-label">Иmy Jermotsı</div>
+            <div v-for="n in sellerNav" :key="n.p"
+                 :class="['nav-item', page === n.p ? 'active' : '']"
+                 @click="page = n.p">
+              <span style="font-size:13px">{{ n.icon }}</span> {{ n.label }}
+              <span v-if="n.badge" :class="['nav-badge', n.badgeType || '']">{{ n.badge }}</span>
+            </div>
+          </template>
+          <template v-if="currentUser.role === 'Buyer'">
+            <div class="nav-group-label">Шука</div>
+            <div v-for="n in buyerNav" :key="n.p"
+                 :class="['nav-item', page === n.p ? 'active' : '']"
+                 @click="page = n.p">
+              <span style="font-size:13px">{{ n.icon }}</span> {{ n.label }}
+              <span v-if="n.badge" :class="['nav-badge', n.badgeType || '']">{{ n.badge }}</span>
+            </div>
+          </template>
+          <div class="sidebar-footer">
+            <div v-if="currentUser.role === 'Admin'" class="commission-widget">
+              <div class="txs tdim tmono">Mijndordavchar Tokos</div>
+              <div class="comm-track">
+                <input type="range" min="1" max="100" step="1" v-model.number="commissionRate">
+                <span class="tgold tmono tsm" style="min-width:36px">{{ commissionRate }}%</span>
+              </div>
+              <div class="txs tdim" style="margin-top:4px;font-size:0.6rem">1% — 100% sahman</div>
+            </div>
+            <div style="padding:0.5rem 0.75rem;display:flex;flex-direction:column;gap:4px">
+              <div class="txs tdim tmono">FloraEx v3.3</div>
+              <div class="txs tdim tmono">{{ todayStr }}</div>
+              <button v-if="currentUser.role === 'Admin'" class="reset-btn" @click="confirmReset" style="margin-top:4px">
+                🗑 Verakangnnel Bardzik Tvyalnerı
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ══ Hamakarg Bovalek ══ -->
+        <main class="content">
+
+          <!-- ═══ ADMIN: Vahanak ═══ -->
+          <template v-if="page === 'dashboard' && currentUser.role === 'Admin'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Bari Galust, {{ currentUser.name }} 👋</div>
+                <div class="page-sub">FloraEx Karavarcum · {{ todayStr }}</div>
+              </div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-card" style="--accent:var(--gold)">
+                <div class="stat-label">Yndameny Shirjanartyan Dzax</div>
+                <div class="stat-val gold">{{ fmtAMD(totalRevenue) }}</div>
+                <div class="stat-meta">{{ orders.filter(o => o.status !== 'Cancelled').length }} hastatvatʿ patver</div>
+              </div>
+              <div class="stat-card" style="--accent:var(--green-l)">
+                <div class="stat-label">FloraEx Mijndordavchar</div>
+                <div class="stat-val green">{{ fmtAMD(myCommission) }}</div>
+                <div class="stat-meta">{{ commissionRate }}% dzaxic</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Akt. Patverner</div>
+                <div class="stat-val">{{ orders.filter(o => o.status !== 'Cancelled').length }}</div>
+                <div class="stat-meta">{{ pendingOrders.length }} spasowm e</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Katalogi Dzaghikner</div>
+                <div class="stat-val">{{ approvedFlowers.length }}</div>
+                <div class="stat-meta">{{ pendingFlowers.length }} hast. sp.</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Gordzakits Ynkernery</div>
+                <div class="stat-val">{{ partners.length }}</div>
+                <div class="stat-meta">{{ sellers.length }} vach. · {{ buyers.length }} gnor.</div>
+              </div>
+              <div class="stat-card" style="--accent:var(--amber)">
+                <div class="stat-label">Bajhnutyunner</div>
+                <div class="stat-val" style="color:var(--amber)">{{ orders.filter(o => o.subscription).length }}</div>
+                <div class="stat-meta">Akt. krknvog pat.</div>
+              </div>
+            </div>
+
+            <!-- Amsekany Shirjanartyan Dzax -->
+            <div class="card mb2">
+              <div class="flex jcb aic" style="margin-bottom:1.25rem">
+                <div class="section-label" style="margin-bottom:0">Amsekany Shirjanartyan Dzax</div>
+                <span class="badge bg-gold">Verj. 6 Amis</span>
+              </div>
+              <div class="bar-chart-wrap">
+                <div v-for="m in monthlyRevenue" :key="m.label" class="bar-wrap">
+                  <div class="bar-val-label">{{ fmtShort(m.val) }}</div>
+                  <div class="bar-col" :style="{ height: maxMonthly > 0 ? Math.max(Math.round(m.val / maxMonthly * 90), 3) + 'px' : '3px' }">
+                    <div class="bar-fill"></div>
+                  </div>
+                  <div class="bar-label">{{ m.label }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anhrajesh Gorcer -->
+            <div v-if="pendingFlowers.length || pendingOrders.length || pendingPayouts.length"
+                 class="card mb2" style="border-color:var(--gold-border)">
+              <div class="section-label" style="color:var(--gold)">⚡ Anhrajesh Gorcer</div>
+              <div v-if="pendingOrders.length" style="margin-bottom:1rem">
+                <div class="tsm tmuted mb1">Nor patverni hastatum anhraje:</div>
+                <div v-for="o in pendingOrders.slice(0, 4)" :key="o.id"
+                     class="flex jcb aic" style="padding:0.45rem 0;border-bottom:1px solid var(--bdr)">
+                  <div class="flex aic g1">
+                    <span class="tmono txs tdim">#{{ String(o.id).slice(-5) }}</span>
+                    <span class="tsm">{{ getUser(o.buyerId)?.name }}</span>
+                    <span v-if="o.subscription" class="badge bg-blue" style="font-size:0.6rem">🔄 {{ o.subscription }}</span>
+                  </div>
+                  <div class="flex g1 aic">
+                    <span class="tgold tsm tmono">{{ fmtAMD(o.total) }}</span>
+                    <button class="btn btn-success btn-xs" @click="updOrderStatus(o.id, 'Confirmed')">✓ Hast.</button>
+                    <button class="btn btn-ghost btn-xs" @click="activeOrder = o">Tesel</button>
+                  </div>
+                </div>
+              </div>
+              <div v-if="pendingFlowers.length" style="margin-bottom:1rem">
+                <div class="tsm tmuted mb1">Dzaghiki cuczak hast. sp.:</div>
+                <div v-for="f in pendingFlowers.slice(0, 3)" :key="f.id"
+                     class="flex jcb aic" style="padding:0.45rem 0;border-bottom:1px solid var(--bdr)">
+                  <div>
+                    <span class="tsm">{{ f.name }}</span>
+                    <span class="txs tdim" style="margin-left:6px">— {{ getUser(f.sellerId)?.name }}</span>
+                  </div>
+                  <div class="flex g1">
+                    <button class="btn btn-success btn-xs" @click="approveFlower(f.id)">✓</button>
+                    <button class="btn btn-danger btn-xs" @click="rejectFlower(f.id)">✕</button>
+                  </div>
+                </div>
+              </div>
+              <div v-if="pendingPayouts.length">
+                <div class="tsm tmuted mb1">Vchayman Haytarutyunner:</div>
+                <div v-for="p in pendingPayouts" :key="p.id"
+                     class="flex jcb aic" style="padding:0.45rem 0;border-bottom:1px solid var(--bdr)">
+                  <div>
+                    <span class="tsm">{{ getUser(p.sellerId)?.name }}</span>
+                    <span class="txs tdim"> uzowm e {{ fmtAMD(p.amount) }}</span>
+                  </div>
+                  <div class="flex g1">
+                    <button class="btn btn-success btn-xs" @click="approvePayout(p.id)">✓ Vcharek</button>
+                    <button class="btn btn-danger btn-xs" @click="rejectPayout(p.id)">✕</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Verlji Patverner -->
+            <div class="card-bare">
+              <div class="flex jcb aic" style="padding:1rem 1.25rem;border-bottom:1px solid var(--bdr)">
+                <div class="section-label" style="margin-bottom:0">Verlji Patverner</div>
+                <button class="btn btn-ghost btn-sm" @click="page = 'admin-orders'">Bolor →</button>
+              </div>
+              <div v-if="!orders.length" class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-text">Patver der chka</div>
+              </div>
+              <table v-else class="tbl">
+                <thead>
+                  <tr><th>Nomer</th><th>Gnord</th><th>Yndameny</th><th>Mijnd.</th><th>Karg.</th><th>Amsk.</th><th></th></tr>
+                </thead>
+                <tbody>
+                  <tr v-for="o in orders.slice(0, 7)" :key="o.id">
+                    <td class="tmono txs tdim">#{{ String(o.id).slice(-5) }}</td>
+                    <td class="tsm">{{ getUser(o.buyerId)?.name || '?' }}</td>
+                    <td class="tgold tmono tsm">{{ fmtAMD(o.total) }}</td>
+                    <td class="tsm tgreen">{{ fmtAMD(Math.round(o.total * commissionRate / 100)) }}</td>
+                    <td><span :class="statusBadge(o.status)">{{ statusLabel(o.status) }}</span></td>
+                    <td class="txs tdim">{{ formatDate(o.date) }}</td>
+                    <td><button class="btn btn-ghost btn-xs" @click="activeOrder = o">▸</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
+
+          <!-- ═══ ADMIN: Bolor Patverner ═══ -->
+          <template v-if="page === 'admin-orders' && currentUser.role === 'Admin'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Bolor Patverner</div>
+                <div class="page-sub">{{ filteredOrders.length }} cuykadrvats</div>
+              </div>
+              <div class="flex g1 aic">
+                <input class="input" v-model="orderSearch" placeholder="Phntrel gnord..." style="width:160px">
+                <select class="input" v-model="orderFilter" style="width:auto">
+                  <option value="">Bolor</option>
+                  <option v-for="s in orderStatuses" :key="s.k" :value="s.k">{{ s.v }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-bare">
+              <div v-if="!filteredOrders.length" class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-text">Patver chi gtnyel</div>
+              </div>
+              <table v-else class="tbl">
+                <thead>
+                  <tr><th>Nomer</th><th>Gnord</th><th>Apranqner</th><th>Yndameny</th><th>Mijnd.</th><th>Bajhnutyun</th><th>Karg.</th><th>Amsk.</th><th></th></tr>
+                </thead>
+                <tbody>
+                  <tr v-for="o in filteredOrders" :key="o.id">
+                    <td class="tmono txs tdim">#{{ String(o.id).slice(-5) }}</td>
+                    <td class="tsm">{{ getUser(o.buyerId)?.name || '?' }}</td>
+                    <td class="txs tdim" style="max-width:160px">{{ o.items.map(i => i.name).join(', ').substring(0, 35) }}…</td>
+                    <td class="tgold tmono tsm">{{ fmtAMD(o.total) }}</td>
+                    <td class="tsm tgreen">{{ fmtAMD(Math.round(o.total * commissionRate / 100)) }}</td>
+                    <td><span v-if="o.subscription" class="badge bg-blue" style="font-size:0.6rem">{{ o.subscription }}</span></td>
+                    <td><span :class="statusBadge(o.status)">{{ statusLabel(o.status) }}</span></td>
+                    <td class="txs tdim">{{ formatDate(o.date) }}</td>
+                    <td><button class="btn btn-ghost btn-xs" @click="activeOrder = o">▸</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
+
+          <!-- ═══ ADMIN: Katalog ═══ -->
+          <template v-if="page === 'admin-listings' && currentUser.role === 'Admin'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Katalog Karavarcum</div>
+                <div class="page-sub">{{ flowers.length }} yndameny · {{ pendingFlowers.length }} spasogi</div>
+              </div>
+            </div>
+            <div v-if="pendingFlowers.length" style="margin-bottom:2rem">
+              <div class="section-label" style="color:var(--gold)">⏳ Hastatum Spasogi</div>
+              <div class="flower-grid">
+                <div v-for="f in pendingFlowers" :key="f.id" class="fcard pending">
+                  <div v-if="f.image" style="height:170px;overflow:hidden">
+                    <img :src="f.image" style="width:100%;height:170px;object-fit:cover">
+                  </div>
+                  <div v-else class="fcard-img-inner">🌸</div>
+                  <div class="fcard-body">
+                    <div class="fcard-name">{{ f.name }}</div>
+                    <div class="txs tdim">{{ getUser(f.sellerId)?.name }}</div>
+                    <div class="pill-row"><span v-if="f.grade" class="badge bg-gray">{{ f.grade }}</span></div>
+                    <div class="fcard-price">{{ fmtAMD(f.price) }}</div>
+                  </div>
+                  <div class="fcard-foot">
+                    <button class="btn btn-success btn-sm" @click="approveFlower(f.id)">✓ Hastatel</button>
+                    <button class="btn btn-danger btn-sm" @click="rejectFlower(f.id)">✕ Merzhel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="section-label">Aktiv Cuczakner ({{ approvedFlowers.length }})</div>
+            <div v-if="!approvedFlowers.length" class="empty-state">
+              <div class="empty-icon">🌱</div>
+              <div class="empty-text">Aktiv cuczak der chka</div>
+            </div>
+            <div v-else class="card-bare">
+              <table class="tbl">
+                <thead>
+                  <tr><th>Dzaghik</th><th>Vachaṙoɣ</th><th>Ɣin</th><th>Dasaran</th><th>Pashar</th><th>Nvaz. Pat.</th><th></th></tr>
+                </thead>
+                <tbody>
+                  <tr v-for="f in approvedFlowers" :key="f.id">
+                    <td>
+                      <div class="flex aic g1">
+                        <div style="width:32px;height:32px;border-radius:var(--r6);overflow:hidden;background:var(--bg5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem">
+                          <img v-if="f.image" :src="f.image" style="width:100%;height:100%;object-fit:cover" @error="e => e.target.style.display='none'">
+                          <span v-else>🌸</span>
+                        </div>
+                        <span class="tsm tserif">{{ f.name }}</span>
+                      </div>
+                    </td>
+                    <td class="tsm tmuted">{{ getUser(f.sellerId)?.name }}</td>
+                    <td class="tgold tmono tsm">{{ fmtAMD(f.price) }}</td>
+                    <td><span v-if="f.grade" class="badge bg-gray">{{ f.grade }}</span></td>
+                    <td class="tsm tmuted">{{ f.stock || '—' }}</td>
+                    <td class="tsm tmuted">{{ f.minOrder || 1 }}</td>
+                    <td><button class="btn btn-danger btn-xs" @click="removeFlower(f.id)">Heracel</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
+
+          <!-- ═══ ADMIN: Gordzakner ═══ -->
+          <template v-if="page === 'admin-users' && currentUser.role === 'Admin'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Gordzakner Karavarcum</div>
+                <div class="page-sub">{{ partners.length }} grancvatʿ gordzakits</div>
+              </div>
+              <div class="flex g1 aic">
+                <button class="btn btn-ghost btn-sm" @click="showPasswords = !showPasswords"
+                        :style="showPasswords ? 'border-color:var(--gold-border);color:var(--gold)' : ''">
+                  {{ showPasswords ? '🙈 Tstsnel' : '👁 Tcel' }} Gaɣtnabaṙnerı
+                </button>
+                <button class="btn btn-primary" @click="modals.addUser = true">+ Grancvel</button>
+              </div>
+            </div>
+            <div class="card-bare">
+              <div v-if="!partners.length" class="empty-state">
+                <div class="empty-icon">👥</div>
+                <div class="empty-text">Gordzakits der chka</div>
+              </div>
+              <table v-else class="tbl">
+                <thead>
+                  <tr><th>Anunı</th><th>Derı</th><th>Shirj.Dzax</th><th>Mutqanunn</th><th>Gaɣtnabaṙ</th><th>Her. Hamar</th><th>Gtnyvelayi Vayr</th><th>Grancman Am.</th><th></th></tr>
+                </thead>
+                <tbody>
+                  <tr v-for="u in partners" :key="u.id">
+                    <td>
+                      <div class="flex aic g1">
+                        <div :class="['avatar', avatarCls(u.role)]" style="width:28px;height:28px;font-size:0.68rem">{{ u.name[0] }}</div>
+                        <div>
+                          <div class="tsm" style="font-weight:500">{{ u.name }}</div>
+                          <div class="txs tdim">{{ u.email || '—' }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span :class="roleBadge(u.role)">{{ roleLabel(u.role) }}</span></td>
+                    <td class="tgold tmono tsm">{{ fmtAMD(userGMV(u.id)) }}</td>
+                    <td class="txs tdim tmono">{{ u.username }}</td>
+                    <td>
+                      <div class="pw-cell">
+                        <span v-if="showPasswords || revealedPasswords[u.id]" class="pw-reveal">{{ u.password }}</span>
+                        <span v-else class="pw-mask">••••••••</span>
+                        <button v-if="!showPasswords" class="pw-toggle" @click="togglePassword(u.id)">
+                          {{ revealedPasswords[u.id] ? '🙈' : '👁' }}
+                        </button>
+                      </div>
+                    </td>
+                    <td class="tsm tmuted">{{ u.phone || '—' }}</td>
+                    <td class="tsm tmuted">{{ u.location || '—' }}</td>
+                    <td class="txs tdim tmono">{{ formatDate(u.createdAt) }}</td>
+                    <td><button class="btn btn-danger btn-xs" @click="deleteUser(u.id)">Jertel</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
+
+          <!-- ═══ ADMIN: Finansner ═══ -->
+          <template v-if="page === 'admin-finances' && currentUser.role === 'Admin'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Finansner</div>
+                <div class="page-sub">Ekamutʿ, mijndordavchar ev vchumner</div>
+              </div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-card" style="--accent:var(--gold)">
+                <div class="stat-label">Yndameny Shirjanartyan Dzax</div>
+                <div class="stat-val gold">{{ fmtAMD(totalRevenue) }}</div>
+              </div>
+              <div class="stat-card" style="--accent:var(--green-l)">
+                <div class="stat-label">Makacʿ Mijndordavchar</div>
+                <div class="stat-val green">{{ fmtAMD(myCommission) }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Handzvats Patverner</div>
+                <div class="stat-val">{{ orders.filter(o => o.status === 'Delivered').length }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Vchumner</div>
+                <div class="stat-val" style="color:var(--amber)">{{ fmtAMD(paidPayoutsTotal) }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Chegharkvatʿ Patverner</div>
+                <div class="stat-val red">{{ fmtAMD(cancelledTotal) }}</div>
+              </div>
+            </div>
+            <div class="section-label">Vachaṙoɣneri Bajhumı</div>
+            <div v-if="!sellers.length" class="empty-state">
+              <div class="empty-icon">🌱</div>
+              <div class="empty-text">Vachaṙoɣ der chka</div>
+            </div>
+            <div v-else class="card-bare mb2">
+              <table class="tbl">
+                <thead>
+                  <tr><th>Vachaṙoɣ</th><th>Patverni Qanak</th><th>Shirj. Dzax</th><th>Mijndordavchar</th><th>Makacʿ Vachaṙuts</th><th>Vchumner</th></tr>
+                </thead>
+                <tbody>
+                  <tr v-for="s in sellers" :key="s.id">
+                    <td>
+                      <div class="flex aic g1">
+                        <div :class="['avatar', avatarCls('Seller')]" style="width:24px;height:24px;font-size:0.62rem">{{ s.name[0] }}</div>
+                        <span class="tsm">{{ s.name }}</span>
+                      </div>
+                    </td>
+                    <td class="tsm tmuted">{{ sellerOrderCount(s.id) }}</td>
+                    <td class="tgold tmono tsm">{{ fmtAMD(sellerRevenue(s.id)) }}</td>
+                    <td class="tgreen tsm tmono">{{ fmtAMD(Math.round(sellerRevenue(s.id) * commissionRate / 100)) }}</td>
+                    <td class="tsm tmono" style="color:var(--amber)">{{ fmtAMD(Math.round(sellerRevenue(s.id) * (1 - commissionRate / 100))) }}</td>
+                    <td class="tsm tmuted">{{ fmtAMD(payouts.filter(p => p.sellerId === s.id && p.status === 'Paid').reduce((sum, p) => sum + p.amount, 0)) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div v-if="payouts.length">
+              <div class="section-label">Vchayman Haytarutyunner</div>
+              <div class="card-bare">
+                <table class="tbl">
+                  <thead>
+                    <tr><th>Vachaṙoɣ</th><th>Gumar</th><th>Bankay Tvyalner</th><th>Amsakan</th><th>Karɣavichakı</th><th></th></tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="p in payouts" :key="p.id">
+                      <td class="tsm">{{ getUser(p.sellerId)?.name }}</td>
+                      <td class="tgold tmono tsm">{{ fmtAMD(p.amount) }}</td>
+                      <td class="txs tmuted">{{ p.details || '—' }}</td>
+                      <td class="txs tdim tmono">{{ formatDate(p.date) }}</td>
+                      <td>
+                        <span :class="p.status === 'Paid' ? 'badge bg-green' : p.status === 'Rejected' ? 'badge bg-red' : 'badge bg-gold'">
+                          {{ p.status === 'Paid' ? 'Vchatvatʿ' : p.status === 'Rejected' ? 'Merzhvatʿ' : 'Spasogi' }}
+                        </span>
+                      </td>
+                      <td>
+                        <div v-if="p.status === 'Pending'" class="flex g1">
+                          <button class="btn btn-success btn-xs" @click="approvePayout(p.id)">✓</button>
+                          <button class="btn btn-danger btn-xs" @click="rejectPayout(p.id)">✕</button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </template>
+
+          <!-- ═══ ADMIN: Banakutyunner ═══ -->
+          <template v-if="page === 'admin-negotiations' && currentUser.role === 'Admin'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Banakutyunner</div>
+                <div class="page-sub">{{ negotiations.filter(n => n.status === 'Pending').length }} spasogi</div>
+              </div>
+            </div>
+            <div v-if="!negotiations.length" class="empty-state">
+              <div class="empty-icon">💬</div>
+              <div class="empty-text">Banakutyun der chka</div>
+            </div>
+            <div v-for="neg in negotiations" :key="neg.id" class="order-card"
+                 :style="neg.status === 'Pending' ? 'border-color:var(--gold-border)' : ''">
+              <div class="flex jcb aic mb1">
+                <div>
+                  <span class="tsm" style="font-weight:500">{{ getUser(neg.buyerId)?.name }}</span>
+                  <span class="txs tdim"> uzowm e </span>
+                  <span class="tsm tgold" style="margin-left:4px">{{ neg.flowerName }}</span>
+                </div>
+                <span :class="neg.status === 'Accepted' ? 'badge bg-green' : neg.status === 'Rejected' ? 'badge bg-red' : 'badge bg-gold'">
+                  {{ neg.status === 'Accepted' ? 'Yndunvatʿ' : neg.status === 'Rejected' ? 'Merzhvatʿ' : 'Spasogi' }}
+                </span>
+              </div>
+              <div class="fg2 mt1">
+                <div class="stat-card" style="padding:0.6rem 0.85rem">
+                  <div class="stat-label">Cuzkatayin Ɣin</div>
+                  <div class="stat-val" style="font-size:1.1rem">{{ fmtAMD(neg.listedPrice) }}</div>
+                </div>
+                <div class="stat-card" style="padding:0.6rem 0.85rem;--accent:var(--gold)">
+                  <div class="stat-label">Arajardzvatʿ Ɣin</div>
+                  <div class="stat-val gold" style="font-size:1.1rem">{{ fmtAMD(neg.offeredPrice) }}</div>
+                </div>
+              </div>
+              <div class="tsm tmuted mt1">Qanak: <strong>{{ neg.qty }}</strong> hat · "{{ neg.message }}"</div>
+              <div v-if="neg.status === 'Pending'" class="flex g1 mt1">
+                <button class="btn btn-success btn-sm" @click="resolveNeg(neg.id, 'Accepted')">✓ Yndunvel</button>
+                <button class="btn btn-ghost btn-sm" @click="resolveNeg(neg.id, 'Counter')">↩ Hakaṙajardz</button>
+                <button class="btn btn-danger btn-sm" @click="resolveNeg(neg.id, 'Rejected')">✕ Merzhel</button>
+              </div>
+            </div>
+          </template>
+
+          <!-- ═══ SELLER: Vahanak ═══ -->
+          <template v-if="page === 's-dashboard' && currentUser.role === 'Seller'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">{{ currentUser.name }}</div>
+                <div class="page-sub">Jermots · {{ todayStr }}</div>
+              </div>
+              <div class="flex g1">
+                <button class="btn btn-ghost btn-sm" @click="modals.payout = true">💰 Vchayman Haytarutyun</button>
+                <button class="btn btn-primary" @click="modals.addFlower = true">+ Dzaghik Avelacnel</button>
+              </div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-card">
+                <div class="stat-label">Cuzkatayin Dzaghikner</div>
+                <div class="stat-val">{{ myFlowers.length }}</div>
+                <div class="stat-meta">{{ myPendingFlowers.length }} hastatum spasogi</div>
+              </div>
+              <div class="stat-card" style="--accent:var(--gold)">
+                <div class="stat-label">Shirjanartyan Ekamutʿ</div>
+                <div class="stat-val gold">{{ fmtAMD(mySellerRevenue) }}</div>
+                <div class="stat-meta">Yndameny</div>
+              </div>
+              <div class="stat-card" style="--accent:var(--green-l)">
+                <div class="stat-label">Makacʿ Ekamutʿ</div>
+                <div class="stat-val green">{{ fmtAMD(mySellerNet) }}</div>
+                <div class="stat-meta">{{ commissionRate }}% hanel mijndordavcharic</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Patverni Qanak</div>
+                <div class="stat-val">{{ mySellerOrders.length }}</div>
+              </div>
+            </div>
+            <div v-if="myPendingFlowers.length" class="info-ribbon mb2">
+              ⏳ <strong>{{ myPendingFlowers.length }}</strong> dzaghik hastatum spasogi e
+            </div>
+            <div v-if="!myFlowers.length" class="empty-state">
+              <div class="empty-icon">🌱</div>
+              <div class="empty-text">Cuzkatayin zanazan der chka</div>
+              <button class="btn btn-primary btn-sm mt1" @click="modals.addFlower = true">+ Dzaghik Avelacnel</button>
+            </div>
+            <template v-else>
+              <div class="section-label">Иmy Dzaghiknerı</div>
+              <div class="flower-grid">
+                <div v-for="f in myFlowers.slice(0, 6)" :key="f.id" class="fcard">
+                  <div v-if="f.image" style="height:150px;overflow:hidden">
+                    <img :src="f.image" style="width:100%;height:150px;object-fit:cover">
+                  </div>
+                  <div v-else class="fcard-img-inner" style="height:150px">🌸</div>
+                  <div class="fcard-body">
+                    <div class="fcard-name">{{ f.name }}</div>
+                    <div class="fcard-price">{{ fmtAMD(f.price) }}</div>
+                  </div>
+                  <div class="fcard-foot">
+                    <span :class="f.status === 'approved' ? 'badge bg-green' : 'badge bg-gold'">{{ f.status === 'approved' ? 'Aktiv' : 'Spasogi' }}</span>
+                    <span class="txs tdim">{{ f.stock || '∞' }} hat</span>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </template>
+
+          <!-- ═══ SELLER: Listings ═══ -->
+          <template v-if="page === 's-listings' && currentUser.role === 'Seller'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Иmy Dzaghiknerı</div>
+                <div class="page-sub">{{ myFlowers.length }} yndameny</div>
+              </div>
+              <button class="btn btn-primary" @click="modals.addFlower = true">+ Dzaghik Avelacnel</button>
+            </div>
+            <div class="flower-grid">
+              <div v-for="f in myFlowers" :key="f.id" class="fcard">
+                <div v-if="f.image" style="height:180px;overflow:hidden">
+                  <img :src="f.image" style="width:100%;height:180px;object-fit:cover">
+                </div>
+                <div v-else class="fcard-img-inner">🌸</div>
+                <div class="fcard-body">
+                  <div class="fcard-name">{{ f.name }}</div>
+                  <div class="pill-row">
+                    <span v-if="f.grade" class="badge bg-gray">{{ f.grade }}</span>
+                    <span v-if="f.stemLength" class="badge bg-gray">{{ f.stemLength }} sm</span>
+                  </div>
+                  <div v-if="f.description" class="txs tdim">{{ f.description }}</div>
+                  <div class="fcard-price">{{ fmtAMD(f.price) }}</div>
+                  <div class="txs tmuted">Nvazagujn {{ f.minOrder || 1 }} hat · Pasharn {{ f.stock || '∞' }}</div>
+                </div>
+                <div class="fcard-foot">
+                  <span :class="f.status === 'approved' ? 'badge bg-green' : 'badge bg-gold'">{{ f.status === 'approved' ? 'Aktiv' : 'Spasogi' }}</span>
+                  <button class="btn btn-danger btn-xs" @click="removeFlower(f.id)">Heracel</button>
+                </div>
+              </div>
+              <div v-if="!myFlowers.length" class="empty-state" style="grid-column:1/-1">
+                <div class="empty-icon">🌱</div>
+                <div class="empty-text">Cuzkatayin zanazan der chka</div>
+              </div>
+            </div>
+          </template>
+
+          <!-- ═══ SELLER: Patverner ═══ -->
+          <template v-if="page === 's-orders' && currentUser.role === 'Seller'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Иmy Patvererı</div>
+                <div class="page-sub">Jermoci patverner</div>
+              </div>
+            </div>
+            <div v-if="!mySellerOrders.length" class="empty-state">
+              <div class="empty-icon">📦</div>
+              <div class="empty-text">Patver der chka</div>
+            </div>
+            <div v-for="o in mySellerOrders" :key="o.id" class="order-card clickable" @click="activeOrder = o">
+              <div class="flex jcb aic mb1">
+                <div class="flex aic g1">
+                  <span class="tmono txs tdim">#{{ String(o.id).slice(-5) }}</span>
+                  <span class="tsm">{{ getUser(o.buyerId)?.name }}</span>
+                  <span v-if="o.subscription" class="badge bg-blue" style="font-size:0.6rem">🔄 {{ o.subscription }}</span>
+                </div>
+                <span :class="statusBadge(o.status)">{{ statusLabel(o.status) }}</span>
+              </div>
+              <div class="order-items">
+                <div v-for="item in o.items.filter(i => myFlowerIds.includes(i.flowerId))" :key="item.flowerId"
+                     class="flex jcb" style="padding:4px 0;border-bottom:1px solid var(--bdr);font-size:0.8rem">
+                  <span>{{ item.name }} × {{ item.qty }}</span>
+                  <span class="tgold tmono">{{ fmtAMD(item.price * item.qty) }}</span>
+                </div>
+              </div>
+              <div class="flex jcb aic mt1">
+                <span class="txs tdim">{{ formatDate(o.date) }}</span>
+                <span class="tgold tserif" style="font-size:1.1rem">{{ fmtAMD(o.total) }}</span>
+              </div>
+            </div>
+          </template>
+
+          <!-- ═══ SELLER: Vichakagrutyun ═══ -->
+          <template v-if="page === 's-analytics' && currentUser.role === 'Seller'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Vichakagrutyun</div>
+                <div class="page-sub">Vachaṙeli Karavarcum</div>
+              </div>
+              <button class="btn btn-primary btn-sm" @click="modals.payout = true">💰 Vchayman Haytarutyun</button>
+            </div>
+            <div class="stat-row">
+              <div class="stat-card" style="--accent:var(--gold)">
+                <div class="stat-label">Yndameny Ekamutʿ</div>
+                <div class="stat-val gold">{{ fmtAMD(mySellerRevenue) }}</div>
+              </div>
+              <div class="stat-card" style="--accent:var(--green-l)">
+                <div class="stat-label">Makacʿ Ekamutʿ</div>
+                <div class="stat-val green">{{ fmtAMD(mySellerNet) }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Vchatsvats Mijndordavchar</div>
+                <div class="stat-val red">{{ fmtAMD(Math.round(mySellerRevenue * commissionRate / 100)) }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Patverni Qanak</div>
+                <div class="stat-val">{{ mySellerOrders.length }}</div>
+              </div>
+            </div>
+            <div class="card mb2">
+              <div class="section-label">Amsekany Ekamutʿ</div>
+              <div class="bar-chart-wrap">
+                <div v-for="m in myMonthlyRevenue" :key="m.label" class="bar-wrap">
+                  <div class="bar-val-label">{{ fmtShort(m.val) }}</div>
+                  <div class="bar-col" :style="{ height: myMaxMonthly > 0 ? Math.max(Math.round(m.val / myMaxMonthly * 90), 3) + 'px' : '3px' }">
+                    <div class="bar-fill"></div>
+                  </div>
+                  <div class="bar-label">{{ m.label }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="section-label">Leavo Vachvats Dzaghikner</div>
+            <div v-if="!topFlowers.length" class="empty-state">
+              <div class="empty-icon">📊</div>
+              <div class="empty-text">Vichakagrutyun der chka</div>
+            </div>
+            <div v-else class="card-bare">
+              <table class="tbl">
+                <thead>
+                  <tr><th>Dzaghik</th><th>Vachvats Qanak</th><th>Ekamutʿ</th><th>Bajhab.</th></tr>
+                </thead>
+                <tbody>
+                  <tr v-for="f in topFlowers" :key="f.id">
+                    <td><div class="tserif tsm">{{ f.name }}</div></td>
+                    <td class="tsm tmuted">{{ f.units }}</td>
+                    <td class="tgold tmono tsm">{{ fmtAMD(f.revenue) }}</td>
+                    <td>
+                      <div class="flex aic g1">
+                        <div style="flex:1;height:4px;background:var(--bg5);border-radius:2px;overflow:hidden">
+                          <div :style="'width:' + f.share + '%;height:100%;background:var(--gold)'"></div>
+                        </div>
+                        <span class="txs tdim tmono">{{ f.share }}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
+
+          <!-- ═══ BUYER: Shuka ═══ -->
+          <template v-if="page === 'marketplace' && currentUser.role === 'Buyer'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Ծaghkayin Shuka</div>
+                <div class="page-sub">{{ marketFlowers.length }} tesak hasaneli</div>
+              </div>
+              <div class="flex g1 aic">
+                <input class="input" v-model="searchQ" placeholder="Phntrel dzaghik..." style="width:180px">
+                <select class="input" v-model="catFilter" style="width:auto">
+                  <option value="">Bolor Kategorianer</option>
+                  <option v-for="c in categories" :key="c.v" :value="c.v">{{ c.l }}</option>
+                </select>
+                <select class="input" v-model="sortMode" style="width:auto">
+                  <option value="default">Kargayin</option>
+                  <option value="price-asc">Ɣin ↑</option>
+                  <option value="price-desc">Ɣin ↓</option>
+                  <option value="name">Anunı A-Z</option>
+                </select>
+              </div>
+            </div>
+            <div v-if="!marketFlowers.length" class="empty-state">
+              <div class="empty-icon">🌺</div>
+              <div class="empty-text">Cuzkatayin dzaghik chi gtnyel</div>
+              <div class="txs tdim" style="margin-top:0.5rem">Vendzerı chkpaten dzaghik chkav nekakel ev hastervel</div>
+            </div>
+            <div v-else class="flower-grid">
+              <div v-for="f in marketFlowers" :key="f.id" class="fcard">
+                <div style="position:relative">
+                  <div v-if="f.image" style="height:190px;overflow:hidden">
+                    <img :src="f.image" style="width:100%;height:190px;object-fit:cover">
+                  </div>
+                  <div v-else class="fcard-img-inner" style="height:190px">🌸</div>
+                  <div style="position:absolute;bottom:8px;left:10px;font-size:0.62rem;font-family:'IBM Plex Mono',monospace;color:rgba(240,221,176,0.9);background:rgba(13,14,11,0.65);padding:2px 6px;border-radius:4px">
+                    {{ getUser(f.sellerId)?.name }}
+                  </div>
+                  <div v-if="f.grade" style="position:absolute;top:8px;right:8px">
+                    <span class="badge bg-gold" style="font-size:0.6rem">{{ f.grade }}</span>
+                  </div>
+                </div>
+                <div class="fcard-body">
+                  <div class="fcard-name">{{ f.name }}</div>
+                  <div class="pill-row">
+                    <span v-if="f.stemLength" class="badge bg-gray">{{ f.stemLength }} sm</span>
+                    <span v-if="f.minOrder" class="badge bg-blue">Nvazagujn {{ f.minOrder }}</span>
+                  </div>
+                  <div v-if="f.description" class="txs tdim">{{ f.description }}</div>
+                  <div class="fcard-price">{{ fmtAMD(f.price) }}</div>
+                </div>
+                <div class="fcard-foot">
+                  <span class="txs tdim">{{ f.stock || '∞' }} hat</span>
+                  <div class="flex g1">
+                    <button class="btn btn-ghost btn-xs" @click="openNegotiate(f)">💬 Banakutyun</button>
+                    <button class="btn btn-primary btn-xs" @click="addToCart(f)">+ Zambyuɣ</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <!-- ═══ BUYER: Patverner ═══ -->
+          <template v-if="page === 'b-orders' && currentUser.role === 'Buyer'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Иmy Patvererı</div>
+                <div class="page-sub">{{ myBuyerOrders.length }} yndameny patver</div>
+              </div>
+              <select v-if="myBuyerOrders.length > 0" class="input" v-model="buyerOrderFilter" style="width:auto">
+                <option value="">Bolor Karɣavichaknery</option>
+                <option v-for="s in orderStatuses" :key="s.k" :value="s.k">{{ s.v }}</option>
+              </select>
+            </div>
+
+            <template v-if="myBuyerOrders.length > 0">
+              <div class="stat-row" style="margin-bottom:1.5rem">
+                <div class="stat-card" style="--accent:var(--gold)">
+                  <div class="stat-label">Yndameny Vcharvatʿ</div>
+                  <div class="stat-val gold">{{ fmtAMD(myBuyerOrders.filter(o => o.status !== 'Cancelled').reduce((s,o) => s + o.total, 0)) }}</div>
+                  <div class="stat-meta">Bolor patverner</div>
+                </div>
+                <div class="stat-card" style="--accent:var(--blue-l)">
+                  <div class="stat-label">Aktiv Patverner</div>
+                  <div class="stat-val blue">{{ myBuyerOrders.filter(o => ['Pending','Confirmed','Shipped'].includes(o.status)).length }}</div>
+                  <div class="stat-meta">Chavartats</div>
+                </div>
+                <div class="stat-card" style="--accent:var(--green-l)">
+                  <div class="stat-label">Handzvats Patverner</div>
+                  <div class="stat-val green">{{ myBuyerOrders.filter(o => o.status === 'Delivered').length }}</div>
+                  <div class="stat-meta">Hajoɣutyamb</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Bajhnutyunner</div>
+                  <div class="stat-val" style="color:var(--amber)">{{ mySubscriptions.length }}</div>
+                  <div class="stat-meta">Aktiv krknvog pat.</div>
+                </div>
+              </div>
+            </template>
+
+            <div v-if="myBuyerOrders.length === 0" class="empty-state">
+              <div class="empty-icon">🛒</div>
+              <div class="empty-text">Duk der patver chunekʿ</div>
+              <button class="btn btn-primary btn-sm mt1" @click="page = 'marketplace'">Gnal Shuka →</button>
+            </div>
+
+            <div v-else-if="filteredBuyerOrders.length === 0" class="empty-state">
+              <div class="empty-icon">🔍</div>
+              <div class="empty-text">Ayd karɣavichaki patver chi gtnyel</div>
+              <button class="btn btn-ghost btn-sm mt1" @click="buyerOrderFilter = ''">Bolor Tesnel</button>
+            </div>
+
+            <template v-else>
+              <div v-for="o in filteredBuyerOrders" :key="o.id" class="order-card clickable" @click="activeOrder = o">
+                <div class="flex jcb aic mb1">
+                  <div class="flex aic g1">
+                    <span class="tmono txs tdim">#{{ String(o.id).slice(-5) }}</span>
+                    <span class="txs tdim">· {{ formatDate(o.date) }}</span>
+                    <span v-if="o.subscription" class="badge bg-blue" style="font-size:0.6rem">🔄 {{ o.subscription }}</span>
+                  </div>
+                  <span :class="statusBadge(o.status)">{{ statusLabel(o.status) }}</span>
+                </div>
+
+                <div class="delivery-track" style="margin:0.85rem 0">
+                  <template v-for="(step, i) in deliverySteps" :key="step.key">
+                    <div class="dstep">
+                      <div v-if="i > 0" class="dline" :class="isStepDone(o.status, step.key) ? 'done' : ''"></div>
+                      <div :class="['dstep-dot', stepClass(o.status, step.key)]" style="width:20px;height:20px;font-size:0.6rem">
+                        {{ isStepDone(o.status, step.key) ? '✓' : i + 1 }}
+                      </div>
+                      <div :class="['dstep-label', stepClass(o.status, step.key)]">{{ step.label }}</div>
+                    </div>
+                  </template>
+                </div>
+
+                <div class="order-items">
+                  <div v-for="item in o.items" :key="item.flowerId"
+                       class="flex jcb aic" style="padding:5px 0;border-bottom:1px solid var(--bdr);font-size:0.82rem">
+                    <div class="flex aic g1">
+                      <span style="font-size:1rem">🌸</span>
+                      <div>
+                        <div style="font-weight:500">{{ item.name }}</div>
+                        <div class="txs tdim">{{ item.qty }} hat × {{ fmtAMD(item.price) }}</div>
+                      </div>
+                    </div>
+                    <span class="tgold tmono">{{ fmtAMD(item.price * item.qty) }}</span>
+                  </div>
+                </div>
+
+                <div class="flex jcb aic mt1" style="padding-top:0.5rem">
+                  <div class="flex aic g1">
+                    <span class="txs tdim">FloraEx-ic</span>
+                    <span v-if="o.status === 'Shipped'" class="badge bg-amber" style="font-size:0.62rem">🚚 Ugharkmany yntacqum</span>
+                    <span v-if="o.status === 'Delivered'" class="badge bg-green" style="font-size:0.62rem">✓ Handvatʿ</span>
+                    <span v-if="o.status === 'Cancelled'" class="badge bg-red" style="font-size:0.62rem">Chegharkvatʿ</span>
+                  </div>
+                  <div class="tr">
+                    <div class="txs tdim">Yndameny</div>
+                    <div class="tserif tgold" style="font-size:1.2rem">{{ fmtAMD(o.total) }}</div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </template>
+
+          <!-- ═══ BUYER: Bajhnutyunner ═══ -->
+          <template v-if="page === 'b-subscriptions' && currentUser.role === 'Buyer'">
+            <div class="page-header">
+              <div>
+                <div class="page-title">Կрknvog Patverner</div>
+                <div class="page-sub">Avtomatacvatʿ zhamanakagrakan handartum</div>
+              </div>
+            </div>
+            <div class="card mb2">
+              <div class="section-label">Inchpes e Ashxatowm</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:0.5rem">
+                <div v-for="s in subSteps" :key="s.n" style="text-align:center;padding:1rem">
+                  <div style="font-size:1.5rem;margin-bottom:0.5rem">{{ s.icon }}</div>
+                  <div class="tsm" style="font-weight:500;margin-bottom:3px">{{ s.title }}</div>
+                  <div class="txs tdim">{{ s.desc }}</div>
+                </div>
+              </div>
+            </div>
+
+            <template v-if="mySubscriptions.length > 0">
+              <div class="stat-row mb2" style="grid-template-columns:repeat(3,1fr)">
+                <div class="stat-card" style="--accent:var(--amber)">
+                  <div class="stat-label">Aktiv Bajhnutyunner</div>
+                  <div class="stat-val" style="color:var(--amber)">{{ mySubscriptions.length }}</div>
+                </div>
+                <div class="stat-card" style="--accent:var(--gold)">
+                  <div class="stat-label">Amsakany Gradzavayrı</div>
+                  <div class="stat-val gold">{{ fmtAMD(mySubscriptions.reduce((s, o) => s + o.total, 0)) }}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Yndameny Patver</div>
+                  <div class="stat-val">{{ myBuyerOrders.filter(o => o.subscription).length }}</div>
+                </div>
+              </div>
+            </template>
+
+            <div class="section-label">Иmy Bajhnutyunnery</div>
+            <div v-if="!mySubscriptions.length" class="empty-state">
+              <div class="empty-icon">🔄</div>
+              <div class="empty-text">Bajhnutyun der chka</div>
+              <button class="btn btn-primary btn-sm mt1" @click="page = 'marketplace'">Gnal Shuka →</button>
+            </div>
+            <div v-for="sub in mySubscriptions" :key="sub.id" class="order-card">
+              <div class="flex jcb aic">
+                <div style="flex:1">
+                  <div class="tsm" style="font-weight:500;margin-bottom:4px">
+                    {{ sub.items.map(i => i.name).join(', ') }}
+                  </div>
+                  <div class="flex aic g1 mt1">
+                    <span class="badge bg-blue">🔄 {{ sub.subscription }}</span>
+                    <span class="txs tdim">Arzhek: {{ fmtAMD(sub.total) }}</span>
+                  </div>
+                </div>
+                <div class="flex g1 aic" style="flex-shrink:0;margin-left:1rem">
+                  <span class="badge bg-green">Aktiv</span>
+                  <button class="btn btn-danger btn-xs" @click="cancelSub(sub.id)">Chegharkel</button>
+                </div>
+              </div>
+            </div>
+          </template>
+
+        </main>
+      </div>
+    </div>
+  </transition>
+
+</div>
+
+<script>
+const { createApp, ref, computed, watch } = Vue
+
+const now = Date.now()
+const daysAgo = n => now - n * 86400000
+
+const DEFAULT_USERS = [
+  { id: 1, name: 'Ադմինիստրատոր', role: 'Admin', email: 'admin@floraex.am', username: 'admin', password: 'admin123', createdAt: now },
+  { id: 2, name: 'Մասիս Ջերմոց', role: 'Seller', phone: '+374 99 000000', email: 'masis@jermots.am', location: 'Մasиs, Ararat', username: 'masis', password: 'masis123', createdAt: now },
+  { id: 3, name: 'Երևան Ծաղկային Խanuth', role: 'Buyer', phone: '+374 10 000000', email: 'order@yfs.am', location: 'Երևան', username: 'yfs', password: 'yfs123', createdAt: now }
+]
+
+const DEFAULT_FLOWERS      = []
+const DEFAULT_ORDERS       = []
+const DEFAULT_PAYOUTS      = []
+const DEFAULT_NEGOTIATIONS = []
+const DEFAULT_COMMISSION   = 12
+
+const LS = {
+  save(key, val) { try { localStorage.setItem('floraex_' + key, JSON.stringify(val)) } catch(e) {} },
+  load(key, def) {
+    try {
+      const v = localStorage.getItem('floraex_' + key)
+      return v != null ? JSON.parse(v) : def
+    } catch(e) { return def }
+  },
+  clear() {
+    ['users','flowers','orders','payouts','negotiations','commissionRate']
+      .forEach(k => localStorage.removeItem('floraex_' + k))
+  }
+}
+
+const deepClone = obj => JSON.parse(JSON.stringify(obj))
+const STEP_ORDER = { Pending: 0, Confirmed: 1, Shipped: 2, Delivered: 3, Cancelled: -1 }
+
+;(function cleanOldData() {
+  try {
+    const stored = localStorage.getItem('floraex_users')
+    if (stored) {
+      const users = JSON.parse(stored)
+      if (users.some(u => u.username === 'ararat' || u.username === 'nordb')) {
+        LS.clear()
+      }
+    }
+  } catch(e) { LS.clear() }
+})()
+
+createApp({
+  data() {
+    return {
+      currentUser: null,
+      loginForm: { username: '', password: '' },
+      loginError: '',
+      newPartnerCreds: null,
+
+      page: 'dashboard',
+      cartOpen: false,
+      cartSubscription: null,
+      activeOrder: null,
+      modals: { addFlower: false, addUser: false, negotiate: null, payout: false },
+      orderFilter: '',
+      orderSearch: '',
+      buyerOrderFilter: '',
+      catFilter: '',
+      searchQ: '',
+      sortMode: 'default',
+      negReply: '',
+      toasts: [],
+
+      showPasswords: false,
+      revealedPasswords: {},
+      cartItems: [],
+
+      users:          LS.load('users',          deepClone(DEFAULT_USERS)),
+      flowers:        LS.load('flowers',        deepClone(DEFAULT_FLOWERS)),
+      orders:         LS.load('orders',         deepClone(DEFAULT_ORDERS)),
+      payouts:        LS.load('payouts',        deepClone(DEFAULT_PAYOUTS)),
+      negotiations:   LS.load('negotiations',   deepClone(DEFAULT_NEGOTIATIONS)),
+      commissionRate: LS.load('commissionRate', DEFAULT_COMMISSION),
+
+      flowerForm: { name: '', price: null, category: 'rose', stemLength: null, stock: null, minOrder: null, grade: 'AA', description: '', image: '' },
+      userForm:   { name: '', role: 'Seller', phone: '', email: '', location: '', username: '', password: '', notes: '' },
+      negForm:    { price: null, qty: null, message: '' },
+      payoutForm: { amount: null, details: '', note: '' },
+
+      deliverySteps: [
+        { key: 'Pending',   label: 'Ձևակերպված'  },
+        { key: 'Confirmed', label: 'Հաստատված'   },
+        { key: 'Shipped',   label: 'Ուղարկված'   },
+        { key: 'Delivered', label: 'Հանձնված'    }
+      ],
+      categories: [
+        { v: 'rose',      l: '🌹 Վard'         },
+        { v: 'lily',      l: '🌷 Shushan'      },
+        { v: 'tulip',     l: '🌺 Kakach'       },
+        { v: 'orchid',    l: '🌸 Kholordz'     },
+        { v: 'sunflower', l: '🌻 Arevadzaghik' },
+        { v: 'peony',     l: '🌼 Baghegh'      },
+        { v: 'mixed',     l: '💐 Kharn'        }
+      ],
+      orderStatuses: [
+        { k: 'Pending',   v: 'Spasogi'      },
+        { k: 'Confirmed', v: 'Hastatvatʿ'   },
+        { k: 'Shipped',   v: 'Ugharkvatʿ'   },
+        { k: 'Delivered', v: 'Handvatʿ'     },
+        { k: 'Cancelled', v: 'Chegharkvatʿ' }
+      ],
+      subSteps: [
+        { n: 1, icon: '🛒', title: 'Avelacnel Zambyughin', desc: 'Dzaghik entrel, qanak nshanel, krknvog handartum entrel' },
+        { n: 2, icon: '✅', title: 'Admin Hastatum',       desc: 'Admin yts yndunowm e bajhnutyuny amsakan' },
+        { n: 3, icon: '🚚', title: 'Avtomat Handzel',     desc: 'Zhamanakagrakan avtomat handzel gnordic' }
+      ]
+    }
+  },
+
+  mounted() {
+    if (!this.users.find(u => u.username === 'admin')) {
+      this.users = deepClone(DEFAULT_USERS)
+    }
+  },
+
+  watch: {
+    users:         { deep: true, handler(v) { LS.save('users', v) } },
+    flowers:       { deep: true, handler(v) { LS.save('flowers', v) } },
+    orders:        { deep: true, handler(v) { LS.save('orders', v) } },
+    payouts:       { deep: true, handler(v) { LS.save('payouts', v) } },
+    negotiations:  { deep: true, handler(v) { LS.save('negotiations', v) } },
+    commissionRate(v) { LS.save('commissionRate', v) }
+  },
+
+  computed: {
+    todayStr() {
+      return new Date().toLocaleDateString('hy-AM', { year: 'numeric', month: 'long', day: 'numeric' })
+    },
+
+    sellers()  { return this.users.filter(u => u.role === 'Seller') },
+    buyers()   { return this.users.filter(u => u.role === 'Buyer')  },
+    partners() { return this.users.filter(u => u.role !== 'Admin')  },
+
+    pendingFlowers()  { return this.flowers.filter(f => f.status === 'pending')  },
+    approvedFlowers() { return this.flowers.filter(f => f.status === 'approved') },
+    pendingOrders()   { return this.orders.filter(o => o.status === 'Pending')   },
+    pendingPayouts()  { return this.payouts.filter(p => p.status === 'Pending')  },
+
+    totalRevenue() {
+      return this.orders
+        .filter(o => o.status !== 'Cancelled')
+        .reduce((sum, o) => sum + o.total, 0)
+    },
+    myCommission() {
+      return Math.round(this.totalRevenue * this.commissionRate / 100)
+    },
+    paidPayoutsTotal() {
+      return this.payouts.filter(p => p.status === 'Paid').reduce((sum, p) => sum + p.amount, 0)
+    },
+    cancelledTotal() {
+      return this.orders.filter(o => o.status === 'Cancelled').reduce((sum, o) => sum + o.total, 0)
+    },
+
+    monthlyRevenue() {
+      const now = new Date()
+      const months = []
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const label = d.toLocaleDateString('hy-AM', { month: 'short' })
+        const year  = d.getFullYear()
+        const month = d.getMonth()
+        const val   = this.orders
+          .filter(o => {
+            if (o.status === 'Cancelled') return false
+            const od = new Date(o.date)
+            return od.getFullYear() === year && od.getMonth() === month
+          })
+          .reduce((sum, o) => sum + o.total, 0)
+        months.push({ label, val })
+      }
+      return months
+    },
+    maxMonthly() {
+      return Math.max(...this.monthlyRevenue.map(m => m.val), 1)
+    },
+
+    myMonthlyRevenue() {
+      if (!this.currentUser) return []
+      const now = new Date()
+      const months = []
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const label = d.toLocaleDateString('hy-AM', { month: 'short' })
+        const year  = d.getFullYear()
+        const month = d.getMonth()
+        const val   = this.mySellerOrders
+          .filter(o => {
+            if (o.status === 'Cancelled') return false
+            const od = new Date(o.date)
+            return od.getFullYear() === year && od.getMonth() === month
+          })
+          .reduce((sum, o) => sum + o.total, 0)
+        months.push({ label, val })
+      }
+      return months
+    },
+    myMaxMonthly() {
+      return Math.max(...this.myMonthlyRevenue.map(m => m.val), 1)
+    },
+
+    myFlowers() {
+      if (!this.currentUser) return []
+      return this.flowers.filter(f => f.sellerId === this.currentUser.id)
+    },
+    myFlowerIds() { return this.myFlowers.map(f => f.id) },
+    myPendingFlowers() { return this.myFlowers.filter(f => f.status === 'pending') },
+
+    mySellerOrders() {
+      return this.orders.filter(o =>
+        o.items.some(i => this.myFlowerIds.includes(i.flowerId))
+      )
+    },
+    mySellerRevenue() {
+      return this.mySellerOrders
+        .filter(o => o.status !== 'Cancelled')
+        .reduce((sum, o) => sum + o.total, 0)
+    },
+    mySellerNet() {
+      return Math.round(this.mySellerRevenue * (1 - this.commissionRate / 100))
+    },
+
+    myBuyerOrders() {
+      if (!this.currentUser) return []
+      return this.orders.filter(o => o.buyerId === this.currentUser.id)
+    },
+    mySubscriptions() {
+      return this.myBuyerOrders.filter(o => o.subscription && o.status !== 'Cancelled')
+    },
+    filteredBuyerOrders() {
+      if (!this.buyerOrderFilter) return this.myBuyerOrders
+      return this.myBuyerOrders.filter(o => o.status === this.buyerOrderFilter)
+    },
+
+    cartCount() { return this.cartItems.reduce((sum, i) => sum + i.qty, 0) },
+    cartTotal() { return this.cartItems.reduce((sum, i) => sum + i.price * i.qty, 0) },
+
+    filteredOrders() {
+      let list = this.orders
+      if (this.orderFilter) list = list.filter(o => o.status === this.orderFilter)
+      if (this.orderSearch) {
+        const q = this.orderSearch.toLowerCase()
+        list = list.filter(o => (this.getUser(o.buyerId)?.name || '').toLowerCase().includes(q))
+      }
+      return list
+    },
+    marketFlowers() {
+      let list = this.approvedFlowers.filter(f => {
+        const q = this.searchQ.toLowerCase()
+        return (!q || f.name.toLowerCase().includes(q) || (f.description||'').toLowerCase().includes(q))
+            && (!this.catFilter || f.category === this.catFilter)
+      })
+      if (this.sortMode === 'price-asc')  list = [...list].sort((a, b) => a.price - b.price)
+      if (this.sortMode === 'price-desc') list = [...list].sort((a, b) => b.price - a.price)
+      if (this.sortMode === 'name')       list = [...list].sort((a, b) => a.name.localeCompare(b.name))
+      return list
+    },
+
+    topFlowers() {
+      const totals = {}
+      this.mySellerOrders.forEach(o => {
+        o.items.filter(i => this.myFlowerIds.includes(i.flowerId)).forEach(i => {
+          if (!totals[i.flowerId]) totals[i.flowerId] = { name: i.name, units: 0, revenue: 0 }
+          totals[i.flowerId].units   += i.qty
+          totals[i.flowerId].revenue += i.price * i.qty
+        })
+      })
+      const list = Object.entries(totals).map(([id, v]) => ({ id, ...v }))
+      const maxR = Math.max(...list.map(f => f.revenue), 1)
+      return list
+        .map(f => ({ ...f, share: Math.round(f.revenue / maxR * 100) }))
+        .sort((a, b) => b.revenue - a.revenue)
+    },
+
+    adminNav() {
+      return [
+        { p: 'dashboard',          icon: '⬛', label: 'Վahanak' },
+        { p: 'admin-orders',       icon: '📋', label: 'Bolor Patverner',   badge: this.pendingOrders.length  || null },
+        { p: 'admin-listings',     icon: '🌸', label: 'Dzaghkeri Katalog', badge: this.pendingFlowers.length || null, badgeType: 'gold' },
+        { p: 'admin-users',        icon: '👥', label: 'Gordzakner' },
+        { p: 'admin-finances',     icon: '💰', label: 'Finansner',          badge: this.pendingPayouts.length || null },
+        { p: 'admin-negotiations', icon: '💬', label: 'Banakutyunner',      badge: this.negotiations.filter(n => n.status === 'Pending').length || null, badgeType: 'gold' }
+      ]
+    },
+    sellerNav() {
+      return [
+        { p: 's-dashboard', icon: '⬛', label: 'Vahanak' },
+        { p: 's-listings',  icon: '🌸', label: 'Cuzkatayin Zanazan', badge: this.myPendingFlowers.length || null, badgeType: 'gold' },
+        { p: 's-orders',    icon: '📋', label: 'Patverner' },
+        { p: 's-analytics', icon: '📊', label: 'Vichakagrutyun' }
+      ]
+    },
+    buyerNav() {
+      return [
+        { p: 'marketplace',     icon: '🛒', label: 'Shuka' },
+        { p: 'b-orders',        icon: '📋', label: 'Иmy Patvererı',   badge: this.myBuyerOrders.filter(o => o.status === 'Shipped').length || null },
+        { p: 'b-subscriptions', icon: '🔄', label: 'Bajhnutyunner', badge: this.mySubscriptions.length || null, badgeType: 'gold' }
+      ]
+    }
+  },
+
+  methods: {
+    doLogin() {
+      this.loginError = ''
+      const u = this.users.find(x => x.username === this.loginForm.username && x.password === this.loginForm.password)
+      if (!u) { this.loginError = 'Sxal mutqanunn kam gaɣtnabaṙ.'; return }
+      this.currentUser = u
+      this.cartItems   = []
+      this.cartSubscription = null
+      this.buyerOrderFilter = ''
+      this.page = u.role === 'Admin' ? 'dashboard' : u.role === 'Seller' ? 's-dashboard' : 'marketplace'
+      this.loginForm = { username: '', password: '' }
+      this.toast('Bari galust, ' + u.name + '!', 'success', '👋')
+    },
+    doLogout() {
+      this.currentUser = null
+      this.cartItems   = []
+      this.cartSubscription = null
+      this.page = 'dashboard'
+      this.buyerOrderFilter = ''
+      this.toast('Duk durs ekatkʿ.', 'info', '⎋')
+    },
+
+    closeAddUser() {
+      this.modals.addUser  = false
+      this.newPartnerCreds = null
+      this.userForm = { name: '', role: 'Seller', phone: '', email: '', location: '', username: '', password: '', notes: '' }
+    },
+    resetAddUserForm() {
+      this.newPartnerCreds = null
+      this.userForm = { name: '', role: 'Seller', phone: '', email: '', location: '', username: '', password: '', notes: '' }
+    },
+
+    getUser(id) { return this.users.find(u => u.id === id) },
+
+    avatarCls(role) { return { Admin: 'av-admin', Seller: 'av-seller', Buyer: 'av-buyer' }[role] || 'av-admin' },
+    roleBadge(role) { return { Admin: 'badge bg-gold', Seller: 'badge bg-green', Buyer: 'badge bg-blue' }[role] || 'badge bg-gray' },
+    roleLabel(role) { return { Admin: 'Ädmin', Seller: 'Vachaṙoɣ', Buyer: 'Gnoṙd' }[role] || role },
+    statusLabel(s)  { return { Pending: 'Spasogi', Confirmed: 'Hastatvatʿ', Shipped: 'Ugharkvatʿ', Delivered: 'Handvatʿ', Cancelled: 'Chegharkvatʿ' }[s] || s },
+    statusBadge(s)  { return { Pending: 'badge bg-gold', Confirmed: 'badge bg-blue', Shipped: 'badge bg-amber', Delivered: 'badge bg-green', Cancelled: 'badge bg-red' }[s] || 'badge bg-gray' },
+
+    formatDate(ts) {
+      if (!ts) return '—'
+      return new Date(ts).toLocaleDateString('hy-AM', { day: '2-digit', month: 'short', year: 'numeric' })
+    },
+    fmtAMD(v) { return (v || 0).toLocaleString() + '֏' },
+    fmtShort(v) {
+      if (!v) return '0'
+      if (v >= 1000000) return (v / 1000000).toFixed(1) + 'M'
+      if (v >= 1000)    return Math.round(v / 1000) + 'K'
+      return String(v)
+    },
+
+    togglePassword(userId) {
+      this.revealedPasswords = { ...this.revealedPasswords, [userId]: !this.revealedPasswords[userId] }
+    },
+
+    confirmReset() {
+      if (confirm('Verakangnelʿ bardzik tarvedyalnerı? Bolor patverner, dzaghikner ev gordzakner kveracen.')) {
+        LS.clear()
+        this.users          = deepClone(DEFAULT_USERS)
+        this.flowers        = deepClone(DEFAULT_FLOWERS)
+        this.orders         = deepClone(DEFAULT_ORDERS)
+        this.payouts        = deepClone(DEFAULT_PAYOUTS)
+        this.negotiations   = deepClone(DEFAULT_NEGOTIATIONS)
+        this.commissionRate = DEFAULT_COMMISSION
+        this.toast('Tarvedyalnerı verakanghatsvecin', 'info', '🔄')
+      }
+    },
+
+    userGMV(id) {
+      const u = this.getUser(id)
+      if (!u) return 0
+      if (u.role === 'Buyer') {
+        return this.orders.filter(o => o.buyerId === id && o.status !== 'Cancelled').reduce((sum, o) => sum + o.total, 0)
+      }
+      const fids = this.flowers.filter(f => f.sellerId === id).map(f => f.id)
+      return this.orders.filter(o => o.status !== 'Cancelled' && o.items.some(i => fids.includes(i.flowerId))).reduce((sum, o) => sum + o.total, 0)
+    },
+    sellerRevenue(id) { return this.userGMV(id) },
+    sellerOrderCount(id) {
+      const fids = this.flowers.filter(f => f.sellerId === id).map(f => f.id)
+      return this.orders.filter(o => o.items.some(i => fids.includes(i.flowerId))).length
+    },
+
+    isStepDone(status, stepKey) {
+      return STEP_ORDER[status] >= STEP_ORDER[stepKey] && status !== 'Cancelled'
+    },
+    stepClass(status, stepKey) {
+      if (status === 'Cancelled') return ''
+      const cur = STEP_ORDER[status], tgt = STEP_ORDER[stepKey]
+      if (cur > tgt)  return 'done'
+      if (cur === tgt) return 'active'
+      return ''
+    },
+
+    addToCart(flower) {
+      const existing = this.cartItems.find(i => i.flowerId === flower.id)
+      if (existing) { existing.qty++ }
+      else { this.cartItems.push({ flowerId: flower.id, name: flower.name, price: flower.price, qty: 1, image: flower.image || null }) }
+      this.toast(flower.name + ' avelacel e zambyughin', 'info', '🌸')
+    },
+    updQty(flowerId, delta) {
+      const item = this.cartItems.find(i => i.flowerId === flowerId)
+      if (!item) return
+      item.qty += delta
+      if (item.qty <= 0) this.removeFromCart(flowerId)
+    },
+    removeFromCart(flowerId) { this.cartItems = this.cartItems.filter(i => i.flowerId !== flowerId) },
+    clearCart() { this.cartItems = [] },
+
+    checkout() {
+      if (this.currentUser?.role !== 'Buyer') { this.toast('Miain gnoṙdnerı karoghen patverarel', 'error', '✕'); return }
+      if (!this.cartItems.length)              { this.toast('Zambyughı datarik e', 'error', '✕'); return }
+      const newOrder = {
+        id:           Date.now(),
+        buyerId:      this.currentUser.id,
+        items:        this.cartItems.map(i => ({ flowerId: i.flowerId, name: i.name, price: i.price, qty: i.qty })),
+        total:        this.cartTotal,
+        status:       'Pending',
+        date:         Date.now(),
+        subscription: this.cartSubscription,
+        negotiations: []
+      }
+      this.orders.unshift(newOrder)
+      this.clearCart()
+      this.cartOpen = false
+      this.cartSubscription = null
+      this.toast('Patver #' + String(newOrder.id).slice(-5) + ' dzevakerpvel e!', 'success', '✓')
+    },
+
+    approveFlower(id) {
+      const f = this.flowers.find(f => f.id === id)
+      if (f) { f.status = 'approved'; this.toast('"' + f.name + '" hastatvel e', 'success', '✓') }
+    },
+    rejectFlower(id) {
+      const f = this.flowers.find(f => f.id === id)
+      if (f && confirm('Merzhel "' + f.name + '"?')) {
+        this.flowers = this.flowers.filter(x => x.id !== id)
+        this.toast('Cuczak merzhvel e', 'info', '✕')
+      }
+    },
+    removeFlower(id) {
+      if (confirm('Heracel cuczakı?')) {
+        this.flowers = this.flowers.filter(f => f.id !== id)
+        this.toast('Dzaghik heracvatʿ e', 'info', '🗑')
+      }
+    },
+    submitFlower() {
+      if (!this.flowerForm.name || !this.flowerForm.price) { this.toast('Anunı ev Ɣinı partz en', 'error', '!'); return }
+      this.flowers.unshift({ ...this.flowerForm, id: Date.now(), sellerId: this.currentUser.id, status: 'pending' })
+      this.toast('"' + this.flowerForm.name + '" nerkaycvatʿ e', 'success', '🌸')
+      this.flowerForm = { name: '', price: null, category: 'rose', stemLength: null, stock: null, minOrder: null, grade: 'AA', description: '', image: '' }
+      this.modals.addFlower = false
+    },
+
+    submitUser() {
+      if (!this.userForm.name || !this.userForm.username || !this.userForm.password) { this.toast('Anunı, Mutqanunn ev Gaɣtnabaṙ partz en', 'error', '!'); return }
+      if (this.users.find(u => u.username === this.userForm.username)) { this.toast('Mutqanunnı arden goyutyun uni', 'error', '!'); return }
+      const newUser = { ...this.userForm, id: Date.now(), createdAt: Date.now() }
+      this.users.push(newUser)
+      this.newPartnerCreds = { name: newUser.name, role: newUser.role, username: newUser.username, password: newUser.password }
+      this.toast(this.userForm.name + ' grancvatʿ e', 'success', '✓')
+    },
+    deleteUser(id) {
+      const u = this.getUser(id)
+      if (u && confirm('Heracel ' + u.name + '?')) {
+        this.users = this.users.filter(x => x.id !== id)
+        this.toast(u.name + ' heracvatʿ e', 'info', '🗑')
+      }
+    },
+
+    updOrderStatus(id, status) {
+      const o = this.orders.find(o => o.id === id)
+      if (o) {
+        o.status = status
+        if (this.activeOrder && this.activeOrder.id === id) {
+          this.activeOrder = { ...o, negotiations: [...(o.negotiations || [])] }
         }
+        this.toast('Patver #' + String(id).slice(-5) + ': ' + this.statusLabel(status), 'success', '✓')
+      }
+    },
 
-        function toggleAuth() {
-            const lSec = document.getElementById('loginSection');
-            const rSec = document.getElementById('regSection');
-            const errs = document.querySelectorAll('.error, .success');
-            errs.forEach(e => e.style.display = 'none');
-            
-            if (lSec.style.display === 'none') {
-                lSec.style.display = 'block';
-                rSec.style.display = 'none';
-            } else {
-                lSec.style.display = 'none';
-                rSec.style.display = 'block';
-            }
-        }
+    openNegotiate(flower) {
+      this.negForm = { price: flower.price, qty: flower.minOrder || 10, message: '' }
+      this.modals.negotiate = flower
+    },
+    submitNeg() {
+      if (!this.negForm.price) { this.toast('Arajardzvatʿ Ɣin partz e', 'error', '!'); return }
+      this.negotiations.unshift({
+        id: Date.now(), buyerId: this.currentUser.id,
+        flowerName: this.modals.negotiate.name, listedPrice: this.modals.negotiate.price,
+        offeredPrice: this.negForm.price, qty: this.negForm.qty, message: this.negForm.message, status: 'Pending'
+      })
+      this.toast('Banakutyun ugharkvatʿ e', 'success', '💬')
+      this.modals.negotiate = null
+    },
+    resolveNeg(id, status) {
+      const n = this.negotiations.find(n => n.id === id)
+      if (n) { n.status = status; this.toast('Banakutyun ' + status, 'success', '✓') }
+    },
 
-        function handleRegister() {
-            const user = document.getElementById('regUser').value.trim();
-            const pass = document.getElementById('regPass').value.trim();
-            const error = document.getElementById('regError');
-            const success = document.getElementById('regSuccess');
+    sendNeg() {
+      if (!this.negReply.trim() || !this.activeOrder) return
+      if (!this.activeOrder.negotiations) this.activeOrder.negotiations = []
+      const msg = { id: Date.now(), fromRole: this.currentUser.role, fromName: this.currentUser.name, text: this.negReply, ts: Date.now() }
+      this.activeOrder.negotiations.push(msg)
+      const o = this.orders.find(o => o.id === this.activeOrder.id)
+      if (o) { if (!o.negotiations) o.negotiations = []; o.negotiations.push({ ...msg }) }
+      this.negReply = ''
+    },
 
-            if (!user || !pass) return;
+    submitPayout() {
+      if (!this.payoutForm.amount) { this.toast('Gumar partz e', 'error', '!'); return }
+      this.payouts.unshift({ id: Date.now(), sellerId: this.currentUser.id, amount: this.payoutForm.amount, details: this.payoutForm.details, note: this.payoutForm.note, date: Date.now(), status: 'Pending' })
+      this.toast('Vchayman haytarutyun ugharkvatʿ e', 'success', '💰')
+      this.payoutForm = { amount: null, details: '', note: '' }
+      this.modals.payout = false
+    },
+    approvePayout(id) {
+      const p = this.payouts.find(p => p.id === id)
+      if (p) { p.status = 'Paid'; this.toast(this.fmtAMD(p.amount) + ' vcharvatʿ e', 'success', '💰') }
+    },
+    rejectPayout(id) {
+      const p = this.payouts.find(p => p.id === id)
+      if (p) { p.status = 'Rejected'; this.toast('Vchayman haytarutyun merzhvatʿ e', 'info', '✕') }
+    },
 
-            if (users.find(u => u.username === user)) {
-                error.style.display = 'block';
-                success.style.display = 'none';
-            } else {
-                users.push({username: user, password: pass});
-                localStorage.setItem('gh_users', JSON.stringify(users));
-                error.style.display = 'none';
-                success.style.display = 'block';
-                setTimeout(toggleAuth, 1500); // Գրանցվելուց հետո ավտոմատ տանել մուտքի էջ
-            }
-        }
+    cancelSub(id) {
+      const o = this.orders.find(o => o.id === id)
+      if (o && confirm('Chegharkeleʿ bajhnutyunı?')) {
+        o.subscription = null; o.status = 'Cancelled'
+        this.toast('Bajhnutyun chegharkvatʿ e', 'info', '🔄')
+      }
+    },
 
-        function handleLogin() {
-            const user = document.getElementById('loginUser').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
-            const error = document.getElementById('loginError');
-
-            const foundUser = users.find(u => u.username === user && u.password === pass);
-
-            if (foundUser) {
-                localStorage.setItem('loggedIn', 'true');
-                localStorage.setItem('username', user);
-                window.location.href = 'flowers.html';
-            } else {
-                error.style.display = 'block';
-            }
-        }
-
-        // Եթե արդեն մուտք է գործել
-        if (localStorage.getItem('loggedIn') === 'true') {
-            window.location.href = 'flowers.html';
-        }
-    </script>
+    toast(text, type = 'info', icon = 'ℹ') {
+      const id = Date.now() + Math.random()
+      this.toasts.push({ id, text, type, icon })
+      setTimeout(() => this.killToast(id), 4000)
+    },
+    killToast(id) { this.toasts = this.toasts.filter(t => t.id !== id) }
+  }
+}).mount('#app')
+</script>
 </body>
-</html>
+</html> 
